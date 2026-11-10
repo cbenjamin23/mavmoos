@@ -29,7 +29,7 @@ ROOT=Path(__file__).resolve().parents[2]
 FIXTURE={'LOG_DISARMED':1,'SERIAL0_PROTOCOL':2,'SERIAL1_PROTOCOL':2}
 INTERVALS='27 200\n26 200\n116 200\n129 200\n245 500\n'
 PROTECTED_SOURCE=('tests/imu/run_native.py','tests/imu/ImuMoosProbe.cpp','tests/imu/audit_native.py','tests/imu/wire_evidence.py',
- 'src/plugins/ImuPlugin.cpp','src/libmavmoos_imu/ImuObservation.cpp','src/libmavmoos_imu/ImuObservation.h',
+ 'src/plugins/ImuPlugin.cpp','src/plugins/ImuObservation.cpp','src/plugins/ImuObservation.h',
  'src/plugins/TelemetryPlugin.cpp','src/libmavmoos_runtime/Plugin.h','src/libmavmoos_runtime/PluginHost.cpp',
  'src/libmavmoos_runtime/Runtime.cpp','src/libmavmoos_runtime/Runtime.h','src/libmavmoos_runtime/RuntimeStream.cpp',
  'src/libmavmoos_runtime/ObservationRequests.cpp','src/libmavmoos_runtime/ObservationRequests.h',
