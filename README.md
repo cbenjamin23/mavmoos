@@ -9,16 +9,22 @@ The current release enables active control only in software-in-the-loop (SITL), 
 ## Start here
 
 - [Vehicle support](docs/vehicle-support.md) and [plugin catalog](docs/plugin-catalog.md)
-- [Copter SITL starter](missions/copter_release/README.md#run-the-demo)
 - [Architecture](docs/architecture.md)
 
 ## Build and test
 
-Put the built MOOS-IvP checkout’s `bin/` on `PATH`. Use CMake 3.24 or newer, Ninja, a C++17 compiler and Python 3. From the MAVMOOS checkout, build and run the receive-only check.
+Put your built MOOS-IvP checkout’s `bin/` on `PATH`, then run this from the MAVMOOS checkout.
 
 ```sh
-./build.sh -j4
-ctest --test-dir build -R '^moos_normal$' --output-on-failure
+./build.sh
 ```
 
-[Setup from scratch](docs/development/from-scratch.md) · [Plugin authoring](docs/development/external-plugins.md) · [Release testing](docs/development/evidence.md)
+See [Get started](https://cbenjamin23.github.io/mavmoos/start.html) for dependencies and the receive-only telemetry check.
+
+## Repository layout
+
+- [`src/`](src/) contains `iMAVLink`, its plugins, and shared libraries. [`examples/`](examples/) shows how to write external plugins.
+- [`missions/`](missions/) holds runnable MOOS mission configurations. [`config/`](config/) holds capability definitions, firmware pins, and test fixtures.
+- [`tests/`](tests/) contains software checks and simulator scenarios. [`scripts/`](scripts/) and [`.github/`](.github/) hold setup and validation automation.
+- [`docs/`](docs/) contains technical guides and [`site/`](site/) contains the documentation website source.
+- [`packaging/`](packaging/) contains Linux packaging and release tooling.
