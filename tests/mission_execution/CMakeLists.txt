@@ -1,0 +1,16 @@
+cmake_minimum_required(VERSION 3.24)
+project(MAVMOOSMissionExecutionPrivate LANGUAGES CXX)
+enable_testing()
+set(CMAKE_CXX_STANDARD 17)
+get_filename_component(REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
+if(NOT MAVLINK_DIR)
+  message(FATAL_ERROR "Supply generated MAVLINK_DIR")
+endif()
+add_executable(copter_mission_execution_tests MissionExecutionTests.cpp
+  "${REPO_ROOT}/src/libmavmoos_control/CopterMissionExecution.cpp")
+target_include_directories(copter_mission_execution_tests SYSTEM PRIVATE "${MAVLINK_DIR}")
+target_include_directories(copter_mission_execution_tests PRIVATE
+  "${REPO_ROOT}/src/libmavmoos_control" "${REPO_ROOT}/src/libmavmoos_runtime")
+target_compile_options(copter_mission_execution_tests PRIVATE -Wall -Wextra -Wpedantic)
+add_test(NAME copter_mission_execution COMMAND copter_mission_execution_tests)
+set_tests_properties(copter_mission_execution PROPERTIES TIMEOUT 15)

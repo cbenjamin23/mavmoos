@@ -1,0 +1,29 @@
+initialize DEPLOY = false
+initialize ROVER_LEG = straight
+initialize MOOS_MANUAL_OVERRIDE = false
+
+Behavior = BHV_Waypoint
+{
+  name = straight_leg
+  pwt = 100
+  condition = DEPLOY = true
+  condition = ROVER_LEG = straight
+  speed = 1
+  capture_radius = 1
+  slip_radius = 2
+  points = $(STRAIGHT_POINT)
+}
+
+Behavior = BHV_Waypoint
+{
+  name = turning_leg
+  pwt = 100
+  condition = DEPLOY = true
+  condition = ROVER_LEG = turn
+  updates = STRESS_ROUTE_UPDATE
+  wpt_index_var = AUTONOMY_INDEX
+  speed = 1
+  capture_radius = 1
+  slip_radius = 2
+  points = $(TURN_POINT)
+}

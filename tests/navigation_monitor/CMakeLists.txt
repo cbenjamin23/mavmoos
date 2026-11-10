@@ -1,0 +1,6 @@
+add_executable(navigation_monitor_tests NavigationMonitorTests.cpp)
+target_include_directories(navigation_monitor_tests PRIVATE "${PROJECT_SOURCE_DIR}/src/libmavmoos_runtime")
+target_link_libraries(navigation_monitor_tests PRIVATE mavlink_headers ${CMAKE_DL_LIBS})
+target_compile_options(navigation_monitor_tests PRIVATE -Wall -Wextra -Wpedantic)
+add_test(NAME navigation_monitor_observations COMMAND navigation_monitor_tests $<TARGET_FILE:mavmoos_navigation_monitor>)
+set_tests_properties(navigation_monitor_observations PROPERTIES TIMEOUT 15)

@@ -1,0 +1,33 @@
+{
+  "tag": "v1.17.0",
+  "tag_object": "a5eb12d2ab591251faa009f76b2685b8cc64405d",
+  "revision": "d6f12ad1c4f70ad3230afd7d86e971421e02fef4",
+  "target": "px4_sitl_default",
+  "model": "sihsim_quadx",
+  "platform": "linux-arm64",
+  "home_correction_window_us": 120000000,
+  "home_settle_timeout_s": 230,
+  "package_kind": "local_upstream_source_build",
+  "package_sha256": "4318d53a7c6f03feb5132ac29d84fed9243b8fcb031201e5d1ee9cc08e66361d",
+  "files": {
+    "bin/px4": "5855d78ee5b79f4ecddd9b1df0fedd270efade9f82cb60bff447d4f9605cae2a",
+    "bin/px4-alias.sh": "3021095f34a995e00a1bd66f80fc1b785f83acedce498a25d461700c9e57c9ce",
+    "etc/init.d-posix/rcS": "8f7c3edd7ab4622f42f30b281584464b325c947e21152c4fcac0cb4acba17705",
+    "etc/init.d-posix/px4-rc.mavlink": "ae7ddfc7f0a8428aa33b53e909862c9f499ca065013c05dbdabf9ef2172899c9",
+    "etc/init.d-posix/px4-rc.simulator": "6a1c29d1d5ab59e726914072ac2bdaadc23bc15750104fa62a761e4f577445b2",
+    "etc/init.d-posix/px4-rc.sihsim": "d502a359413443cbc631aea20f685518fddd2a644d2ed063f59ec383a26808c4",
+    "etc/init.d-posix/airframes/10040_sihsim_quadx": "812ba7678498c18b05390233ca9bfb042a63e215bd70271085962131fc16008b"
+  },
+  "retained_work_files": {
+    "mavmoos-build/bin/iMAVLink": "3f34ab99453133d0e0a13de47cf0013a0d939770688c2d0517e4433d443236f0",
+    "mavmoos-build/bin/px4_offboard_moos_probe": "a9e8edd390105e13506114edda8f863784a51db2361e4917295f6d8b5048ded3",
+    "moos-ivp/bin/pHelmIvP": "81f2bf8931a77977b8e0bd5de17bffec7a64a5d37f6cbceea59071f74e679b0e",
+    "moos-ivp/bin/MOOSDB": "2e2ccb6f52b04eede00818b0a63be81efdabb97f303a9c3fefea2dd10a00866d",
+    "moos-ivp/bin/pAntler": "565d3d6867df302f9941d6ad2f04b7062fca5ddce1e00361782cf4e4256b67d8",
+    "moos-ivp/bin/pLogger": "131eb7fc7d62347a9719e79e4ac86a3bc5ae1298520277f28992d65fdc57224c",
+    "moos-ivp/bin/nsplug": "da733183496f43ead1969022662e995017aac2c846749039c4aa93a35f8088a3",
+    "altitude/build/lib/libBHV_ConstantAltitude.so": "821ba27b64541c1fa57202e2a2026b020ad766b9a445753be88cf33ef15d72a0",
+    "mavmoos-build/plugins/mavmoos_telemetry.so": "536c731fbf909b97593351df14f61fbddd94f81a41bd698902d167e73012ad5d",
+    "mavmoos-build/plugins/mavmoos_px4_control.so": "26722daf38c5b721ff79b07d564b50e1a8bc93ce4036355012183fb86d44842a"
+  }
+}

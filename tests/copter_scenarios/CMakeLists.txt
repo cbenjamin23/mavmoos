@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.24)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  project(MavmoosCopterScenarioProbe LANGUAGES CXX)
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  set(MOOS_IVP_ROOT "$ENV{MOOS_IVP_ROOT}" CACHE PATH "Built stock MOOS-IvP checkout")
+  find_package(MOOS 10.0 REQUIRED CONFIG PATHS
+    "${MOOS_IVP_ROOT}/build/MOOS/MOOSCore" "${MOOS_IVP_ROOT}/build/MOOS" NO_DEFAULT_PATH)
+endif()
+add_executable(copter_scenario_probe CopterScenarioProbe.cpp)
+target_link_libraries(copter_scenario_probe PRIVATE ${MOOS_LIBRARIES})
+target_compile_options(copter_scenario_probe PRIVATE -Wall -Wextra -Wpedantic)

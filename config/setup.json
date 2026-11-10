@@ -1,0 +1,28 @@
+{
+  "moos": {
+    "repository": "https://github.com/moos-ivp/moos-ivp.git",
+    "revision": "1de9ae146cd63c209e8c3fd81611a4ed2472971b",
+    "qualification_revision": "023fb54e00692611ecee2cd6f1138d10eec2127e"
+  },
+  "uav": {
+    "repository": "https://github.com/cbenjamin23/moos-ivp-uav-base.git",
+    "revision": "e34a62ef49c2be42215a69c351850cbd85881486"
+  },
+  "archives": {
+    "cpm-file": {
+      "name": "CPM_0.43.1.cmake",
+      "url": "https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.43.1/CPM.cmake",
+      "sha256": "1c40fc102ce9625d7de7eb14f541cab30cc3138dca627f0b0ec40293ce6c2934"
+    },
+    "proj-archive": {
+      "name": "proj-5.2.0.tar.gz",
+      "url": "https://codeload.github.com/OSGeo/PROJ/tar.gz/refs/tags/5.2.0",
+      "sha256": "11958654f92314ba4fd72fb697d975d2a9c22cd7eb3545798019b099f8285d91"
+    },
+    "mavlink-archive": {
+      "name": "mavlink.tar.gz",
+      "url": "https://codeload.github.com/mavlink/c_library_v2/tar.gz/a2d0ecf011a4aaa7840480e43f4e38d8c9e79d29",
+      "sha256": "3fc41a3cd46717b1aa226b958aed0829fbe7b7c9793bc8ffdcca76345a9dfde3"
+    }
+  }
+}

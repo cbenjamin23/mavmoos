@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="690" height="1084" viewBox="0 0 690 1084" role="img" aria-labelledby="title description">
+  <title id="title">MAVMOOS on the backseat computer</title>
+  <desc id="description">Operator and mission apps and pHelmIvP exchange navigation data, helm guidance and operator requests through MOOSDB. MOOS mail reaches the plugin host in one iMAVLink process. The host loads configured, version-matched plugins at startup. Shared plugins handle telemetry, sensors, missions and parameters. A vehicle-control plugin handles native modes, actions and the helm adapter. Both use a common runtime for vehicle state, control authority and restart recovery. The runtime uses one MAVLink connection to an ArduPilot or PX4 flight controller, with final permission and expiry checks before sending.</desc>
+  <defs>
+    <marker id="arrow" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto-start-reverse">
+      <path d="M1 1l6 3-6 3" fill="none" stroke="#55758e" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      text { font: 650 18px system-ui, sans-serif; fill: #182e42; text-anchor: middle; }
+      .detail { font-size: 16px; font-weight: 500; fill: #466177; }
+      .channel-label { font-size: 15px; }
+      .boundary { fill: #eaf2f9; stroke: #bfd3e4; stroke-width: 1.4; }
+      .process { fill: #dbe9f5; stroke: #a9c3da; stroke-width: 1.4; }
+      .node { fill: #fff; stroke: #a9c3da; stroke-width: 1.4; }
+      .channel { fill: #f6faff; stroke: #a9c3da; stroke-width: 1.2; }
+      .edge { fill: none; stroke: #55758e; stroke-width: 1.6; marker-end: url(#arrow); }
+      .both { marker-start: url(#arrow); }
+      .from-runtime { marker-start: url(#arrow); marker-end: none; }
+    </style>
+  </defs>
+
+  <rect x="17" y="135" width="638" height="829" rx="12" class="boundary"/>
+  <text x="336" y="158">Vehicle backseat computer</text>
+  <rect x="30" y="413" width="612" height="532" rx="10" class="process"/>
+  <text x="336" y="436">iMAVLink · one process</text>
+
+  <path d="M347 101v6q0 8 8 8h124q8 0 8 8v107q0 8-8 8h-47q-8 0-8 8v5" class="edge both"/>
+  <path d="M347 220v31" class="edge both"/>
+  <path d="M386 342v16" class="edge both"/>
+  <path d="M386 390v5q0 8-8 8H226q-8 0-8 8v28" class="edge both"/>
+  <path d="M173 526v28" class="edge"/>
+  <path d="M265 526v6q0 6 6 6h152q6 0 6 6v10" class="edge"/>
+  <path d="M173 637v19" class="edge from-runtime"/>
+  <path d="M173 702v30" class="edge"/>
+  <path d="M469 637v23" class="edge from-runtime"/>
+  <path d="M469 698v7q0 8-8 8H251q-8 0-8 8v11" class="edge"/>
+  <path d="M211 825v36" class="edge both"/>
+  <path d="M257 936v66" class="edge both"/>
+
+  <rect x="219" y="41" width="256" height="56" rx="15" class="node"/>
+  <text x="347" y="75">Operator and mission apps</text>
+
+  <rect x="220" y="167" width="254" height="49" rx="14" class="node"/>
+  <text x="347" y="198">pHelmIvP</text>
+  <rect x="259" y="255" width="254" height="83" rx="14" class="node"/>
+  <text x="386" y="279">MOOSDB</text>
+  <text x="386" y="300" class="detail">Navigation data, helm guidance</text>
+  <text x="386" y="320" class="detail">and operator requests</text>
+  <rect x="332" y="362" width="108" height="24" rx="12" class="channel"/>
+  <text x="386" y="379" class="channel-label">MOOS mail</text>
+
+  <rect x="90" y="444" width="256" height="78" rx="14" class="node"/>
+  <text x="218" y="468">Plugin host</text>
+  <text x="218" y="489" class="detail">Loads version-matched plugins</text>
+  <text x="218" y="509" class="detail">from configuration at startup</text>
+  <rect x="48" y="558" width="250" height="75" rx="14" class="node"/>
+  <text x="173" y="582">Shared plugins</text>
+  <text x="173" y="603" class="detail">Telemetry, sensors, missions</text>
+  <text x="173" y="623" class="detail">and parameters</text>
+  <rect x="335" y="558" width="268" height="75" rx="14" class="node"/>
+  <text x="469" y="582">Vehicle-control plugin</text>
+  <text x="469" y="603" class="detail">Native modes and actions</text>
+  <text x="469" y="623" class="detail">Helm adapter</text>
+
+  <rect x="61" y="660" width="224" height="38" rx="14" class="channel"/>
+  <text x="173" y="676" class="channel-label">Observations and</text>
+  <text x="173" y="691" class="channel-label">service requests</text>
+  <rect x="350" y="664" width="238" height="30" rx="14" class="channel"/>
+  <text x="469" y="684" class="channel-label">Guidance and control requests</text>
+  <rect x="84" y="736" width="254" height="85" rx="14" class="node"/>
+  <text x="211" y="763">Shared runtime</text>
+  <text x="211" y="784" class="detail">Vehicle state, control authority</text>
+  <text x="211" y="804" class="detail">and restart recovery</text>
+  <rect x="117" y="865" width="280" height="67" rx="14" class="node"/>
+  <text x="257" y="889">MAVLink transport</text>
+  <text x="257" y="909" class="detail">One connection · Final permission</text>
+  <text x="257" y="926" class="detail">and expiry checks before sending</text>
+  <rect x="133" y="1006" width="248" height="62" rx="15" class="node"/>
+  <text x="257" y="1032">ArduPilot or PX4</text>
+  <text x="257" y="1054">flight controller</text>
+</svg>

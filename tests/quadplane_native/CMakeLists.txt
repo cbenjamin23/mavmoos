@@ -1,0 +1,5 @@
+add_executable(quadplane_runtime_tests QuadPlaneRuntimeTests.cpp)
+target_link_libraries(quadplane_runtime_tests PRIVATE mavmoos_runtime)
+add_test(NAME quadplane_runtime COMMAND quadplane_runtime_tests
+  $<TARGET_FILE:mavmoos_arduquadplane_control> $<TARGET_FILE:mavmoos_missions>)
+set_tests_properties(quadplane_runtime PROPERTIES TIMEOUT 20)

@@ -1,0 +1,45 @@
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>Connect <span class="unbroken">MOOS-IvP</span> to ArduPilot and PX4 over MAVLink</h1>
+        <p class="lede">Read vehicle telemetry in MOOS, request flight-controller modes and actions, and send live guidance from the IvP Helm.</p>
+        <div class="actions">
+          <a class="button primary" href="architecture.html">Architecture <span aria-hidden="true">→</span></a>
+          <a class="button secondary" href="[[repository_url]]">View on GitHub</a>
+        </div>
+      </div>
+      <figure class="bridge-card" aria-label="Telemetry flows to MOOS-IvP. Mode commands and helm guidance flow to the flight controller.">
+        <div class="bridge-node"><strong>MOOS-IvP</strong><span>IvP Helm and MOOS apps</span></div>
+        <div class="bridge-edge">
+          <span><b aria-hidden="true">↑</b> Navigation and status</span>
+          <span><b aria-hidden="true">↓</b> Mode requests and helm guidance</span>
+        </div>
+        <div class="bridge-node bridge-center"><strong>MAVMOOS</strong><span>Translates MOOS and MAVLink</span></div>
+        <div class="bridge-edge">
+          <span><b aria-hidden="true">↑</b> Vehicle telemetry</span>
+          <span><b aria-hidden="true">↓</b> Mode commands and movement targets</span>
+        </div>
+        <div class="bridge-node"><strong>ArduPilot or PX4</strong><span>Flight controller</span></div>
+      </figure>
+    </section>
+    <section class="section section-rule" aria-labelledby="bridge-intro">
+      <div class="section-head">
+        <h2 id="bridge-intro">What the bridge does</h2>
+        <p>MAVMOOS connects MOOS-IvP to a flight controller running ArduPilot or PX4. MOOS apps can request mode changes and vehicle actions. When the IvP Helm has control, it supplies live guidance. The flight controller handles vehicle motion and reports position and status back to MOOS-IvP.</p>
+      </div>
+    </section>
+    <section class="section" aria-labelledby="bridge-architecture">
+      <div class="section-head"><h2 id="bridge-architecture">How it fits together</h2></div>
+      [[backseat_diagram]]
+    </section>
+    <section class="section" id="plugins" aria-labelledby="plugin-heading">
+      <div class="section-head">
+        <h2 id="plugin-heading">Plugins</h2>
+        <p>Choose the control plugin for your vehicle and add the shared capabilities your mission needs. Each guide describes its supported workflows and test evidence.</p>
+      </div>
+      <div class="plugin-list">[[provider_index]]</div>
+    </section>
+    <nav class="section section-rule next-links" aria-label="Explore the documentation">
+      <a class="surface" href="start.html"><strong>Get started <span aria-hidden="true">→</span></strong><span>Build from source and verify your first telemetry.</span></a>
+      <a class="surface" href="architecture.html"><strong>Architecture <span aria-hidden="true">→</span></strong><span>See how the bridge, helm and plugins work together.</span></a>
+      <a class="surface" href="maintenance.html"><strong>Maintenance <span aria-hidden="true">→</span></strong><span>See how we test changes and qualify firmware.</span></a>
+    </nav>

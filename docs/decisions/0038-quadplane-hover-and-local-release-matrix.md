@@ -1,0 +1,7 @@
+# 0038 — QuadPlane hover and the local release matrix
+
+November 7, 2026. Use a separate opt-in hover configuration within the existing QuadPlane provider. ArduPlane 4.6.3 resets its VTOL loiter state on a normal Guided reposition. Its stock Lua target update can retain that state. The hover fixture loads a small adapter on the owned simulator and uses ordinary stock pHelmIvP outputs. [ArduPilot Guided behavior](https://ardupilot.org/plane/docs/quadplane-auto-mode.html#guided-mode) · [Pinned Lua target update](https://github.com/ArduPilot/ardupilot/blob/3fc7011a7d3dc047cbb17d8bd98ee94577d144c6/ArduPlane/ArduPlane.cpp#L930-L952)
+
+The bridge admits bounded position steps in observed Guided hover, using a single-use challenge and the remaining lifetime of the original helm decision. The FC adapter checks its own mode, motion envelope and expiry. A fresh native QLoiter observation and explicit acquisition establish a new grant after expiry or takeover. The FC owns the transitions and forward segment of this hover workflow. The existing forward-helm configuration retains its own firmware settings and qualification.
+
+The local release gate reads its required case list from the candidate commit. It binds the host simulator cases to the software build and the PX4 cases to the Linux kit's build. Each receipt keeps its firmware, frame and scenario identity. The experimental PX4 Ackermann cases retain separate qualification. [Release guide](../development/sitl-release.md)

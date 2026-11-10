@@ -1,0 +1,70 @@
+    <header class="page-intro">
+      <h1>Architecture</h1>
+      <p class="lede">One MOOS app connects the IvP Helm and other MOOS apps to the flight controller. Plugins add capabilities. The bridge checks when each one may send.</p>
+    </header>
+    [[bridge_diagram]]
+    <div class="article-layout section">
+      <nav class="surface contents" aria-label="On this page">
+        <strong>On this page</strong>
+        <a href="#host">One bridge</a>
+        <a href="#intent">Helm guidance</a>
+        <a href="#authority">Who has control</a>
+        <a href="#modules">Plugin boundaries</a>
+        <a href="#backseat">Backseat deployment</a>
+        <a href="#simulation">Simulation testing</a>
+        <a href="#influences">Design references</a>
+        <a href="#omissions">MAVROS scope choices</a>
+      </nav>
+      <div class="article">
+        <section id="host">
+          <h2>One bridge owns the connection</h2>
+          <p>The MOOS app, <code>iMAVLink</code>, reads from the selected vehicle and passes each message to the plugins that use it. Sharing one connection lets every plugin work from the same vehicle identity and state. It also gives the bridge one place to settle which request a reply belongs to.</p>
+          <p>Vehicle readings carry their source and age. For example, a position report can become old while the app is still connected. MAVMOOS keeps the sample’s age and publishes navigation coordinates only when it has a usable estimate and a known origin. That gives the helm a position it can interpret.</p>
+          <p>The bridge can replace a waiting guidance target when a newer one arrives. Just before sending, it checks that the target is still current and the helm still has permission.</p>
+        </section>
+        <section id="intent">
+          <h2>The helm publishes its usual variables</h2>
+          <p>A waypoint behavior helps the IvP Helm decide where to go. <code>pHelmIvP</code> publishes its usual outputs, such as <code>DESIRED_HEADING</code> and <code>DESIRED_SPEED</code>, to MOOSDB. MAVMOOS reads those variables and translates them into MAVLink targets for the flight controller. Use the <code>pHelmIvP</code> you already have and configure the mission to provide the inputs the selected vehicle plugin expects.</p>
+        </section>
+        <section id="authority">
+          <h2>Who has control</h2>
+          <p>The flight controller always steers and stabilizes the vehicle. When the operator enables helm control, MAVMOOS sends guidance once the controller is ready and the helm has a fresh target.</p>
+          <p>To hand control back, the operator requests a flight-controller mode. MAVMOOS stops sending helm guidance and checks that the controller switched modes.</p>
+          <p>Some vehicles can hold briefly and resume when guidance returns. After a longer gap, pilot takeover or a restart, the operator must enable helm control again. MAVMOOS first checks that any potentially active autopilot mission has stopped.</p>
+        </section>
+        <section id="modules">
+          <h2>Group plugins by what they own</h2>
+          <p>Enable at most one vehicle-control plugin when the app starts. It handles native modes and helm targets together. For example, selecting native Hold and following a helm route both affect who steers a Rover. One plugin owns that decision for the vehicle, and the bridge applies the same send checks across control plugins.</p>
+          <p>Some shared plugins publish vehicle readings for MOOS apps. For example, a navigation app can use the age of a position report to decide whether it is still useful. Other shared plugins handle requests such as reading a parameter, transferring a mission or downloading a log. A live parameter read returns the value from the controller or reports a failure if the request times out.</p>
+          <p>Mission, fence and rally plans share the <code>missions</code> plugin because they use the same transfer channel. That plugin can coordinate cancellation and verify what the controller stored. By contrast, <code>attitude</code>, <code>imu</code> and <code>air_data</code> have separate plugins because orientation estimates, raw motion sensor readings and air measurements arrive at different rates and can become stale independently.</p>
+          <p>External plugins load at startup and must match the app’s binary interface, the agreement that lets separately compiled code work with the host. The host keeps ownership of the connection and sending rules. <a href="index.html#plugins">Browse plugins</a> · [[external_plugins]]</p>
+        </section>
+        <section id="backseat">
+          <h2>MAVMOOS on the backseat computer</h2>
+          [[backseat_diagram]]
+        </section>
+        <section id="simulation">
+          <h2>Test guidance in simulation</h2>
+          <p>Much of our testing uses software-in-the-loop (SITL), where real autopilot firmware controls a simulated vehicle. MAVMOOS has a dedicated <strong>shadow mode</strong> for testing how it interprets a MOOS mission. It publishes the targets it would send so you can inspect them in MOOS while MAVLink output stays off.</p>
+          <p>Start in receive-only mode if you just want to check telemetry. For a full control test, MAVMOOS and the simulator exchange real MAVLink packets over UDP loopback, which keeps the traffic on the test computer.</p>
+        </section>
+        <section id="influences">
+          <h2>What we took from MAVROS and pArduBridge</h2>
+          <p>MAVROS showed how to separate the connection, vehicle state and feature plugins. Its command, mission and sensor handlers give us a reference for message direction, units, coordinate frames and acknowledgements. pArduBridge grounded the ArduCopter and ArduPlane operator workflows and how they fit ordinary MOOS missions.</p>
+          <p>When MAVROS changes, we trace the affected messages to the local plugins and tests, even when MAVMOOS groups features differently.</p>
+        </section>
+        <section id="omissions">
+          <h2>MAVROS capabilities outside our scope</h2>
+          <ul class="plain-list">
+            <li><strong>Direct control</strong> · <code>actuator_control</code>, <code>manual_control</code>, <code>setpoint_accel</code>, <code>setpoint_attitude</code>, <code>setpoint_trajectory</code>. The helm supplies navigation goals and the flight controller handles stabilization. Virtual sticks, actuator commands and lower-level targets would add ways to steer that need their own takeover and fallback rules.</li>
+            <li><strong>External position and velocity inputs</strong> · <code>mocap_pose_estimate</code>, <code>vision_pose</code>, <code>vision_speed</code>. MAVMOOS has tested one input that supplies position and motion estimates. A new camera or motion-capture input needs checks for coordinate frames, timing and accuracy, plus tests of what the autopilot does if the feed stops.</li>
+            <li><strong>Obstacle and route inputs</strong> · <code>obstacle_distance_3d</code>, <code>trajectory</code>. A MOOS app would need to supply an obstacle map or a timed path. We would then need to verify that the chosen flight controller uses it correctly and handles stale data.</li>
+            <li><strong>Traffic, terrain and landing</strong> · <code>adsb</code>, <code>terrain</code>, <code>landing_target</code>. MAVMOOS handles selected incoming messages. Sending traffic back requires a trusted source of aircraft tracks. Serving terrain tiles requires reliable elevation data. Precision landing needs a target detector and a tested response when the target disappears.</li>
+            <li><strong>Simulator interfaces</strong> · <code>hil</code>, <code>sim_state</code>. The test fixtures already connect to the simulator and measure the vehicle’s response independently. Keeping those interfaces in the fixtures lets the bridge use the same flight-controller interface in every test.</li>
+            <li><strong>Peripheral and host tools</strong> · <code>cam_imu_sync</code>, <code>mag_calibration_status</code>, <code>play_tune</code>, <code>companion_process_status</code>, <code>onboard_computer_status</code>. The current camera workflow captures images without synchronizing them to inertial readings. Calibration progress and tunes are separate operator workflows. Host diagnostics are already available in MOOS.</li>
+            <li><strong>Raw packet forwarding</strong> · <code>tunnel</code>. MAVMOOS exposes specific operations it can check before sending. Arbitrary payloads would need separate rules for who can send, where packets can go and how much traffic is allowed.</li>
+          </ul>
+          <p>The [[mavros_crosswalk]] details partial overlaps and message directions.</p>
+        </section>
+      </div>
+    </div>

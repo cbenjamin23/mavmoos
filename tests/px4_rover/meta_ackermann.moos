@@ -1,0 +1,73 @@
+ServerHost = localhost
+ServerPort = $(MOOS_PORT)
+Community = px4_ackermann
+MOOSTimeWarp = 1
+LatOrigin = $(LAT_ORIGIN)
+LongOrigin = $(LONG_ORIGIN)
+
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 80
+  Run = $(DB_PATH) @ NewConsole = false
+  Run = $(APP_PATH) @ NewConsole = false ~ iMAVLink
+  Run = $(HELM_PATH) @ NewConsole = false
+  Run = $(LOGGER_PATH) @ NewConsole = false
+}
+
+ProcessConfig = iMAVLink
+{
+  AppTick = 30
+  CommsTick = 30
+  bind_address = 127.0.0.1
+  bind_port = 14540
+  peer_address = 127.0.0.1
+  peer_port = 14580
+  target_system = 1
+  target_component = 1
+  expected_type = 10
+  expected_autopilot = 12
+  simulation_only = true
+  sitl_pid = $(SITL_PID)
+  shadow_mode = false
+  helm_enabled = true
+  control_helm = true
+  control_native_actions = true
+  control_mission_execution = true
+  auto_recovery_directory = $(RECOVERY_DIRECTORY)
+  vehicle_profile = px4_rover_ackermann
+  plugins = telemetry,px4_rover_control,missions
+  plugin_directory = $(PLUGIN_DIRECTORY)
+  helm_source = pHelmIvP
+  freshness_timeout = 0.9
+  handoff_window = 0.9
+  field_spread = 0.3
+  nav_position_timeout = 0.5
+  firmware_requests = false
+  max_datagrams_per_iter = 96
+  max_queue_age = 0.25
+  lat_origin = $(LAT_ORIGIN)
+  long_origin = $(LONG_ORIGIN)
+}
+
+ProcessConfig = pHelmIvP
+{
+  AppTick = 12
+  CommsTick = 20
+  behaviors = targ_px4.bhv
+  domain = course:0:359:360
+  domain = speed:0:1.5:31
+  start_in_drive = true
+  verbose = quiet
+}
+
+ProcessConfig = pLogger
+{
+  AppTick = 10
+  CommsTick = 20
+  File = LOG_PX4_ACKERMANN
+  PATH = ./logs
+  SyncLog = false
+  AsyncLog = true
+  LogAuxSrc = true
+  WildCardLogging = true
+}

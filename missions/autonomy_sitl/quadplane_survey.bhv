@@ -1,0 +1,67 @@
+//-------------------------------------------------
+// FILE: quadplane_survey.bhv
+// NAME: MAVMOOS project
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+initialize AUTONOMY_STAGE = entry
+initialize BHV_ERROR_SEEN = false
+
+Behavior = BHV_Waypoint
+{
+  name = entry_track
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = entry
+  points = 8,0
+  speed = 2
+  capture_radius = 1.5
+  slip_radius = 2.5
+  endflag = AUTONOMY_STAGE = climb
+}
+
+Behavior = BHV_Waypoint
+{
+  name = inspection_track
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = climb
+  points = 8,7:15,7
+  speed = 2
+  capture_radius = 1.5
+  slip_radius = 2.5
+  endflag = AUTONOMY_STAGE = done
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = entry_height
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = entry
+  altitude = 60
+  duration = -1
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = inspection_height
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE != entry
+  altitude = 65
+  duration = -1
+}
+
+Behavior = BHV_StationKeep
+{
+  name = exit_station
+  pwt = 1
+  condition = DEPLOY = true
+  station_pt = 15,7
+  center_activate = false
+  inner_radius = 0.8
+  outer_radius = 2.5
+  outer_speed = 1
+  transit_speed = 1
+}

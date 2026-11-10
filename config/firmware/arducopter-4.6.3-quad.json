@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "kind": "mavmoos.firmware_source",
+  "profile_id": "arducopter-4.6.3-quad",
+  "role": "candidate",
+  "qualification": "not_inferred",
+  "vehicle_profile": "arducopter",
+  "target": {
+    "system_id": 1,
+    "component_id": 1,
+    "mav_type": 2,
+    "autopilot": 3
+  },
+  "source": {
+    "repository": "https://github.com/ArduPilot/ardupilot.git",
+    "revision": "92b0cd788ec29406f26c6f9c31d5ceedbd1cc538",
+    "release_label": "ArduCopter V4.6.3",
+    "version": {
+      "major": 4,
+      "minor": 6,
+      "patch": 3,
+      "release_type": 255
+    },
+    "submodules": [
+      {
+        "path": "modules/ChibiOS",
+        "revision": "88b84600b59d2f39c9d9137aacdc9f098b374b4a"
+      },
+      {
+        "path": "modules/CrashDebug",
+        "revision": "599965086437137ec0fe66e185611f43f335f889"
+      },
+      {
+        "path": "modules/CrashDebug/CrashCatcher",
+        "revision": "4cf6e11df3a081b0f573a7834ed8e1e4000af73e"
+      },
+      {
+        "path": "modules/CrashDebug/CrashCatcher/CppUTest",
+        "revision": "011f371fdb5d7e441fb023be67295783e053df4a"
+      },
+      {
+        "path": "modules/CrashDebug/mri",
+        "revision": "b35c89451b41a45b7f5b580acaff555315ac88e2"
+      },
+      {
+        "path": "modules/CrashDebug/mri/CppUTest",
+        "revision": "011f371fdb5d7e441fb023be67295783e053df4a"
+      },
+      {
+        "path": "modules/DroneCAN/DSDL",
+        "revision": "0856687a5acb42b55d29bbad8f4fc9e19b4989fc"
+      },
+      {
+        "path": "modules/DroneCAN/dronecan_dsdlc",
+        "revision": "43d8a9ed909e18f169c001a0f418edc72269b36b"
+      },
+      {
+        "path": "modules/DroneCAN/libcanard",
+        "revision": "9b05a4d8eebf82684053d07e6d04fe2b0c922a6e"
+      },
+      {
+        "path": "modules/DroneCAN/libcanard/drivers/avr/avr-can-lib",
+        "revision": "9c6bc9118de66d6edaf1b8539e2b9717ba26d123"
+      },
+      {
+        "path": "modules/DroneCAN/pydronecan",
+        "revision": "1f494e9a56ac9930f1e11c2f453789414b10d54e"
+      },
+      {
+        "path": "modules/Micro-CDR",
+        "revision": "3d1b17703c7cf4f22def2910bc845bdb5152d7b5"
+      },
+      {
+        "path": "modules/Micro-XRCE-DDS-Client",
+        "revision": "97175304425c5bee87c6fddd99de1ef8d0c394dc"
+      },
+      {
+        "path": "modules/gbenchmark",
+        "revision": "d572f4777349d43653b21d6c2fc63020ab326db2"
+      },
+      {
+        "path": "modules/gsoap",
+        "revision": "e1f690585d4803402584962bfaa8240ecaf1db30"
+      },
+      {
+        "path": "modules/gtest",
+        "revision": "c5fed93f941865a0e912e9baf46ded713506590a"
+      },
+      {
+        "path": "modules/lwip",
+        "revision": "143a6a5cb8023921b5dced55c30551ffb752b640"
+      },
+      {
+        "path": "modules/mavlink",
+        "revision": "bb87bc7390af7f21d9ad33a45c8be02997fecd24"
+      },
+      {
+        "path": "modules/mavlink/pymavlink",
+        "revision": "8ba67079211a4315681bc84a44c37b383448d664"
+      },
+      {
+        "path": "modules/waf",
+        "revision": "35eadbb64e2052099a853b571e507c33032b392c"
+      }
+    ],
+    "protected_files": {
+      "ArduCopter/version.h": "4ae9ac14adb728ba02152007c0ae682a8f800a712cf6873ec790a444d248917b",
+      "Tools/autotest/default_params/copter.parm": "5e01345b45d1c6190b28bece5638bbdd4cf1cce35e05bbbf480ab24d2b51aa0e",
+      "libraries/GCS_MAVLink/GCS_Common.cpp": "63a1129b3de96ebf3281839e44a38d87c9cf777dc1f924fb33fe365521c1c314"
+    }
+  },
+  "artifact_path": "build/sitl/bin/arducopter",
+  "dependencies": {
+    "mavlink_revision": "a2d0ecf011a4aaa7840480e43f4e38d8c9e79d29",
+    "mavlink_archive_sha256": "3fc41a3cd46717b1aa226b958aed0829fbe7b7c9793bc8ffdcca76345a9dfde3",
+    "moos_revision": "023fb54e00692611ecee2cd6f1138d10eec2127e",
+    "uav_revision": "e34a62ef49c2be42215a69c351850cbd85881486"
+  },
+  "fixture": {
+    "model": "quad",
+    "timewarp": 1,
+    "home": [
+      42.358456,
+      -71.087589,
+      10,
+      0
+    ],
+    "default_parameter_file": "Tools/autotest/default_params/copter.parm",
+    "parameters": {
+      "LOG_DISARMED": 1,
+      "SERIAL0_PROTOCOL": 2,
+      "SERIAL1_PROTOCOL": 2,
+      "SIM_WIND_SPD": 0
+    },
+    "hardware": false
+  }
+}

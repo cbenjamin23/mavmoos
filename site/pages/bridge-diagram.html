@@ -1,0 +1,36 @@
+    <figure class="surface system-map" aria-label="MAVMOOS architecture">
+      <div class="system-map-flow">
+        <div class="system-component">
+          <h3>MOOS-IvP</h3>
+          <dl>
+            <dt>IvP Helm</dt><dd>Plans movement</dd>
+            <dt>Operator and mission apps</dt><dd>Request modes and actions</dd>
+            <dt>MOOS database (MOOSDB)</dt><dd>Shares requests and vehicle state</dd>
+          </dl>
+        </div>
+        <div class="system-link">
+          <span><span class="system-arrow" aria-hidden="true">→</span> Commands and guidance</span>
+          <span><span class="system-arrow" aria-hidden="true">←</span> Navigation and status</span>
+        </div>
+        <div class="system-component system-host">
+          <h3>MAVMOOS <code>iMAVLink</code></h3>
+          <dl>
+            <dt>Helm adapter</dt><dd>Checks recent guidance</dd>
+            <dt>Control and shared plugins</dt><dd>Translate actions and telemetry</dd>
+            <dt>Shared send policy</dt><dd>Enforces permission and expiry</dd>
+          </dl>
+        </div>
+        <div class="system-link">
+          <span><span class="system-arrow" aria-hidden="true">→</span> MAVLink commands and targets</span>
+          <span><span class="system-arrow" aria-hidden="true">←</span> MAVLink telemetry and replies</span>
+        </div>
+        <div class="system-component">
+          <h3>ArduPilot or PX4</h3>
+          <dl>
+            <dt>Mode changes</dt><dd>Checks and acts on requests to switch modes</dd>
+            <dt>Live guidance</dt><dd>Follows movement targets when the helm has control</dd>
+            <dt>Vehicle control</dt><dd>Steers and stabilizes the vehicle</dd>
+          </dl>
+        </div>
+      </div>
+    </figure>

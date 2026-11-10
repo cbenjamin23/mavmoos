@@ -1,0 +1,5 @@
+add_executable(px4_runtime_tests Px4RuntimeTests.cpp)
+target_link_libraries(px4_runtime_tests PRIVATE mavmoos_runtime)
+add_test(NAME px4_runtime COMMAND px4_runtime_tests $<TARGET_FILE:mavmoos_px4_control>)
+add_test(NAME px4_fixed_wing_runtime COMMAND px4_runtime_tests $<TARGET_FILE:mavmoos_px4_control> --fixed-wing)
+set_tests_properties(px4_runtime px4_fixed_wing_runtime PROPERTIES TIMEOUT 15)

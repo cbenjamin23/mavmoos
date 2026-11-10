@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "kind": "mavmoos.plane_native_fixture",
+  "profile_id": "arduplane-4.6.3-plane",
+  "vehicle_profile": "arduplane",
+  "qualification": "not_inferred",
+  "target": {
+    "system_id": 1,
+    "component_id": 1,
+    "mav_type": 1,
+    "autopilot": 3
+  },
+  "source": {
+    "repository": "https://github.com/ArduPilot/ardupilot.git",
+    "tag": "Plane-4.6.3",
+    "revision": "3fc7011a7d3dc047cbb17d8bd98ee94577d144c6",
+    "tree": "2f054de4203be3890f7200d4dfdb34858de04757",
+    "release_label": "ArduPlane V4.6.3",
+    "version": {
+      "major": 4,
+      "minor": 6,
+      "patch": 3,
+      "release_type": 255
+    },
+    "submodules": [
+      {
+        "path": "modules/ChibiOS",
+        "revision": "88b84600b59d2f39c9d9137aacdc9f098b374b4a"
+      },
+      {
+        "path": "modules/CrashDebug",
+        "revision": "599965086437137ec0fe66e185611f43f335f889"
+      },
+      {
+        "path": "modules/CrashDebug/CrashCatcher",
+        "revision": "4cf6e11df3a081b0f573a7834ed8e1e4000af73e"
+      },
+      {
+        "path": "modules/CrashDebug/CrashCatcher/CppUTest",
+        "revision": "011f371fdb5d7e441fb023be67295783e053df4a"
+      },
+      {
+        "path": "modules/CrashDebug/mri",
+        "revision": "b35c89451b41a45b7f5b580acaff555315ac88e2"
+      },
+      {
+        "path": "modules/CrashDebug/mri/CppUTest",
+        "revision": "011f371fdb5d7e441fb023be67295783e053df4a"
+      },
+      {
+        "path": "modules/DroneCAN/DSDL",
+        "revision": "0856687a5acb42b55d29bbad8f4fc9e19b4989fc"
+      },
+      {
+        "path": "modules/DroneCAN/dronecan_dsdlc",
+        "revision": "43d8a9ed909e18f169c001a0f418edc72269b36b"
+      },
+      {
+        "path": "modules/DroneCAN/libcanard",
+        "revision": "9b05a4d8eebf82684053d07e6d04fe2b0c922a6e"
+      },
+      {
+        "path": "modules/DroneCAN/libcanard/drivers/avr/avr-can-lib",
+        "revision": "9c6bc9118de66d6edaf1b8539e2b9717ba26d123"
+      },
+      {
+        "path": "modules/DroneCAN/pydronecan",
+        "revision": "1f494e9a56ac9930f1e11c2f453789414b10d54e"
+      },
+      {
+        "path": "modules/Micro-CDR",
+        "revision": "3d1b17703c7cf4f22def2910bc845bdb5152d7b5"
+      },
+      {
+        "path": "modules/Micro-XRCE-DDS-Client",
+        "revision": "97175304425c5bee87c6fddd99de1ef8d0c394dc"
+      },
+      {
+        "path": "modules/gbenchmark",
+        "revision": "d572f4777349d43653b21d6c2fc63020ab326db2"
+      },
+      {
+        "path": "modules/gsoap",
+        "revision": "e1f690585d4803402584962bfaa8240ecaf1db30"
+      },
+      {
+        "path": "modules/gtest",
+        "revision": "c5fed93f941865a0e912e9baf46ded713506590a"
+      },
+      {
+        "path": "modules/lwip",
+        "revision": "143a6a5cb8023921b5dced55c30551ffb752b640"
+      },
+      {
+        "path": "modules/mavlink",
+        "revision": "bb87bc7390af7f21d9ad33a45c8be02997fecd24"
+      },
+      {
+        "path": "modules/mavlink/pymavlink",
+        "revision": "8ba67079211a4315681bc84a44c37b383448d664"
+      },
+      {
+        "path": "modules/waf",
+        "revision": "35eadbb64e2052099a853b571e507c33032b392c"
+      }
+    ],
+    "protected_files": {
+      "ArduPlane/version.h": "0703c172ccc846a38ed2614fe0e5cd8f79af5c684a6e84f2dc57e011840a0d26",
+      "ArduPlane/GCS_Mavlink.cpp": "9295d88828f25e11b1e1b1d700f455931de94e4f8382aafdb7ac91bafe35bb73",
+      "ArduPlane/system.cpp": "8445573fae900624c8ba51783e80c07ebdcdafa19b0e4419b9ce8e5a48a2a9c4",
+      "ArduPlane/events.cpp": "60961d0a1db459c1be8c43b05bbfdd43bbd38fcb75f2d6cbe7b6e71e3d4b4403",
+      "libraries/GCS_MAVLink/GCS_Common.cpp": "63a1129b3de96ebf3281839e44a38d87c9cf777dc1f924fb33fe365521c1c314",
+      "libraries/GCS_MAVLink/GCS_Param.cpp": "ca5b1eaa33544e408f56ac015304e884d5bed4f348c7e25dd1f3ce3ed6dae6e2"
+    }
+  },
+  "native": {
+    "platform": "darwin",
+    "architecture": "arm64",
+    "format": "Mach-O 64-bit executable arm64",
+    "artifact": {
+      "bytes": 4357896,
+      "path": "source/build/sitl/bin/arduplane",
+      "sha256": "b977ff6cd559f6a6c3d16cfb57c1e32840291210eb593e4f7254fea701137fa5"
+    },
+    "build_attestation_sha256": "3ddd2117e19fe1238e1d05cb483946a5c9801aea4c467f2fbdcac5d9f6e34a75"
+  },
+  "dependencies": {
+    "mavlink_revision": "a2d0ecf011a4aaa7840480e43f4e38d8c9e79d29",
+    "moos_revision": "023fb54e00692611ecee2cd6f1138d10eec2127e",
+    "stock_helm_sha256": "5b3d2e705609c37b5b5000384655b4491010d6d797b94c43830d9972e684a876"
+  },
+  "fixture": {
+    "model": "plane",
+    "timewarp": 1,
+    "hardware": false,
+    "home": [
+      42.358456,
+      -71.087589,
+      10,
+      0
+    ],
+    "model_defaults": {
+      "path": "Tools/autotest/models/plane.parm",
+      "sha256": "93ba9a70c771609a90b81249d6a1d5a9df8d48bef7d149b42b2d9c7fbd06494a"
+    },
+    "gcs_source": {
+      "system_id": 245,
+      "component_id": 191
+    },
+    "fixture_operator": {
+      "system_id": 249,
+      "component_id": 190
+    },
+    "parameters": {
+      "AIRSPEED_CRUISE": 22,
+      "AIRSPEED_MAX": 30,
+      "AIRSPEED_MIN": 10,
+      "ARMING_CHECK": 1,
+      "ARSPD2_TYPE": 0,
+      "ARSPD_PRIMARY": 0,
+      "ARSPD_TYPE": 100,
+      "ARSPD_USE": 1,
+      "FLTMODE3": 12,
+      "FLTMODE4": 5,
+      "FLTMODE_CH": 8,
+      "FS_GCS_ENABL": 1,
+      "FS_LONG_ACTN": 1,
+      "FS_LONG_TIMEOUT": 5,
+      "LOG_DISARMED": 1,
+      "NAVL1_PERIOD": 15,
+      "Q_ENABLE": 0,
+      "RTL_ALTITUDE": 65,
+      "RTL_AUTOLAND": 0,
+      "RTL_RADIUS": 0,
+      "SERIAL0_PROTOCOL": 2,
+      "SERIAL1_PROTOCOL": 2,
+      "SERIAL2_PROTOCOL": 2,
+      "SIM_ARSPD_FAIL": 0,
+      "SIM_ARSPD_RND": 0.5,
+      "SIM_WIND_SPD": 0,
+      "SIM_WIND_TURB": 0,
+      "SYSID_MYGCS": 245,
+      "SYSID_THISMAV": 1,
+      "TKOFF_ALT": 65,
+      "TKOFF_DIST": 300,
+      "WP_LOITER_RAD": 80
+    }
+  }
+}

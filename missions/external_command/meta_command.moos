@@ -1,0 +1,40 @@
+// Standalone example command community. Stock MOOSDB, no helm.
+ServerHost = 127.0.0.1
+ServerPort = $(MOOS_PORT)
+Community = external_disarmed_command
+MOOSTimeWarp = 1
+TERM_REPORTING = false
+
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 50
+  Run = MOOSDB @ NewConsole = false
+  Run = $(APP_PATH) @ NewConsole = false
+}
+
+ProcessConfig = iMAVLink
+{
+  AppTick = 50
+  CommsTick = 50
+  bind_address = 127.0.0.1
+  bind_port = $(BIND_PORT)
+  peer_address = 127.0.0.1
+  peer_port = $(PEER_PORT)
+  target_system = 1
+  target_component = 1
+  expected_type = 2
+  expected_autopilot = 3
+  vehicle_profile = arducopter
+  simulation_only = $(SIMULATION_ONLY)
+  shadow_mode = $(SHADOW_MODE)
+  sitl_pid = $(SITL_PID)
+  helm_enabled = false
+  control_native_actions = false
+  control_helm = false
+  control_mission_execution = false
+  firmware_requests = false
+  plugin_directory = $(PLUGIN_DIRECTORY)
+  plugins = arducopter_control,example_disarmed_command
+  plugin.example_disarmed_command.request_source = $(REQUEST_SOURCE)
+  plugin.example_disarmed_command.observation_timeout = 1.5
+}

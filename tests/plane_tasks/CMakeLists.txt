@@ -1,0 +1,4 @@
+add_executable(plane_helm_task_tests PlaneHelmTaskTests.cpp)
+target_link_libraries(plane_helm_task_tests PRIVATE mavmoos_plane_components mavmoos_control_components)
+add_test(NAME plane_helm_tasks COMMAND plane_helm_task_tests)
+set_tests_properties(plane_helm_tasks PROPERTIES TIMEOUT 15)

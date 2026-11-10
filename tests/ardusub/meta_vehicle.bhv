@@ -1,0 +1,29 @@
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+
+Behavior = BHV_ConstantHeading
+{
+  name = east
+  condition = DEPLOY = true
+  pwt = 100
+  heading = 90
+  duration = -1
+}
+
+Behavior = BHV_ConstantSpeed
+{
+  name = transit_speed
+  condition = DEPLOY = true
+  pwt = 100
+  speed = 0.7
+  duration = -1
+}
+
+Behavior = BHV_ConstantDepth
+{
+  name = dive_below_home
+  condition = DEPLOY = true
+  pwt = 100
+  depth = 2
+  duration = -1
+}

@@ -1,0 +1,93 @@
+//-------------------------------------------------
+// FILE: meta_vehicle.moos
+// NAME: Charles Benjamin
+//-------------------------------------------------
+ServerHost = localhost
+ServerPort = $(MOOS_PORT)
+Community = copter
+MOOSTimeWarp = 1
+LatOrigin = $(LAT_ORIGIN)
+LongOrigin = $(LONG_ORIGIN)
+
+//----------------------------------------------------
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 100
+  Run = MOOSDB @ NewConsole = false
+  Run = $(APP_PATH) @ NewConsole = false ~ iMAVLink
+  Run = pHelmIvP @ NewConsole = false
+  Run = pLogger @ NewConsole = false
+  Run = uProcessWatch @ NewConsole = false
+}
+
+//----------------------------------------------------
+ProcessConfig = iMAVLink
+{
+  AppTick = 30
+  CommsTick = 30
+  bind_address = 127.0.0.1
+  bind_port = $(BIND_PORT)
+  peer_address = 127.0.0.1
+  peer_port = $(PEER_PORT)
+  target_system = 1
+  target_component = 1
+  expected_type = 2
+  expected_autopilot = 3
+  simulation_only = $(SIMULATION_ONLY)
+  shadow_mode = $(SHADOW_MODE)
+  helm_enabled = true
+  plugins = telemetry,parameters,arducopter_control
+  operation_helm_enabled = true
+  operation_timeout = 60
+  operation_radius = 1
+  operation_speed = $(SPEED)
+  facing_policy = $(FACING_POLICY)
+  facing_heading = $(FACING_HEADING)
+  sitl_pid = $(SITL_PID)
+  plugin_directory = $(PLUGIN_DIRECTORY)
+  lat_origin = $(LAT_ORIGIN)
+  long_origin = $(LONG_ORIGIN)
+  helm_source = pHelmIvP
+  freshness_timeout = 2
+  handoff_window = 0.5
+  field_spread = 0.5
+  nav_position_timeout = 0.5
+}
+
+//----------------------------------------------------
+ProcessConfig = pHelmIvP
+{
+  AppTick = 10
+  CommsTick = 20
+  behaviors = targ_copter.bhv
+  domain = course:0:359:360
+  domain = speed:0:5:51
+  domain = altitude:0:50:51
+  start_in_drive = true
+  verbose = quiet
+  ivp_behavior_dir = $(BEHAVIOR_DIRECTORY)
+}
+
+//----------------------------------------------------
+ProcessConfig = pLogger
+{
+  AppTick = 10
+  CommsTick = 20
+  File = LOG_COPTER
+  PATH = ./logs
+  SyncLog = false
+  AsyncLog = true
+  LogAuxSrc = true
+  WildCardLogging = true
+}
+
+//----------------------------------------------------
+ProcessConfig = uProcessWatch
+{
+  AppTick = 2
+  CommsTick = 2
+  watch = iMAVLink
+  watch = pHelmIvP
+  watch = pLogger
+  nowatch = uMAC*
+}

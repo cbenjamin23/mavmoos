@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.24)
+project(MAVMOOSMissionFaultProbe LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+find_package(MOOS 10.0 REQUIRED CONFIG PATHS "${MOOS_IVP_ROOT}/build/MOOS/MOOSCore" "${MOOS_IVP_ROOT}/build/MOOS" NO_DEFAULT_PATH)
+add_executable(mission_fault_probe MissionFaultProbe.cpp)
+target_link_libraries(mission_fault_probe PRIVATE ${MOOS_LIBRARIES})
+target_compile_options(mission_fault_probe PRIVATE -Wall -Wextra -Wpedantic)

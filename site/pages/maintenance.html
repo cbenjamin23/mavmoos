@@ -1,0 +1,45 @@
+    <header class="page-intro">
+      <h1>Maintenance</h1>
+      <p class="lede">How we check that MAVMOOS behaves as expected, exercise failures, and keep that evidence current as firmware changes.</p>
+    </header>
+    <div class="article-layout">
+      <nav class="surface contents" aria-label="On this page">
+        <strong>On this page</strong>
+        <a href="#pipeline">How we test</a>
+        <a href="#firmware">New firmware</a>
+        <a href="#qualification">Release testing</a>
+        <a href="#control-coverage">Coverage and limits</a>
+      </nav>
+      <div class="article">
+        <section id="pipeline">
+          <h2>How we test</h2>
+          <p>Continuous integration and delivery (CI/CD) is a repeatable process for checking changes and qualifying a version for release. We test in layers because a message that looks correct in isolation may still lead to the wrong vehicle behavior during a mission.</p>
+          <ol class="plain-list">
+            <li><strong>Test decisions and failures in software.</strong> We can deliberately send stale guidance, drop a reply or replay a command after restart. These checks make it possible to reproduce a specific edge case and see whether the bridge rejects it, holds authority closed or avoids a duplicate send.</li>
+            <li><strong>Observe the vehicle in simulation.</strong> In software-in-the-loop (SITL), real autopilot firmware controls a simulated vehicle. We check the effect independently through the reported mode, movement or recorded state. For example, a stop can require measured low speed, and a landing can require touchdown and disarm.</li>
+            <li><strong>Combine real mission phases.</strong> Longer scenarios run the IvP Helm alongside native autopilot modes. They include route changes, takeover, loss of guidance and recovery. For example, the Copter survey pauses a native mission, revises the helm route, and checks that a repeated abort request does not send twice. That exposes problems during the handoff between systems.</li>
+          </ol>
+          <p>Before qualifying a release, we run the required software checks, verify the Linux installation from a different directory, and repeat the simulator scenarios from one clean source commit.</p>
+        </section>
+        <section id="firmware">
+          <h2>How we qualify new firmware</h2>
+          <p>We keep a known tested version and run the same scenarios against a new firmware candidate. Each run records the exact firmware and vehicle configuration. That matters because a mode, fallback or transition can behave differently on a new version or a different frame.</p>
+          <p>We review changed behavior before promoting a candidate to the tested set. We keep the previous result and preserve failures so we can trace a change back to the firmware, vehicle setup or bridge.</p>
+        </section>
+        <section id="qualification">
+          <h2>Release testing</h2>
+          <div class="surface result-overview">
+            <dl class="metrics">
+              <div><dt>Software checks passed</dt><dd>[[software]]</dd></div>
+              <div><dt>SITL scenarios passed</dt><dd>[[native]]</dd></div>
+              <div><dt>Linux install check</dt><dd>Passed</dd></div>
+            </dl>
+            <p>The release gate includes [[stress]] stress missions that combine helm guidance with native autopilot modes.</p>
+          </div>
+        </section>
+        <section id="control-coverage">
+          <h2>Coverage and limits</h2>
+          <p>Focused mission and fault tests add coverage for cases such as crossing traffic and bridge restarts. Results apply to the vehicle configuration, firmware version, connection and computer used in each simulation. [[control_matrix_guide]]</p>
+        </section>
+      </div>
+    </div>

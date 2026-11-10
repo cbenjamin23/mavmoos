@@ -1,0 +1,5 @@
+add_library(mavmoos_control_components STATIC CopterCommands.cpp CopterOperations.cpp CopterMissionExecution.cpp HelmAdapter.cpp ArduCopterBackend.cpp)
+set_target_properties(mavmoos_control_components PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(mavmoos_control_components PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/src/libmavmoos_runtime")
+target_link_libraries(mavmoos_control_components PUBLIC mavlink_headers mavmoos_egress)
+target_compile_options(mavmoos_control_components PRIVATE -Wall -Wextra -Wpedantic)

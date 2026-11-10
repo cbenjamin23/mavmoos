@@ -1,0 +1,35 @@
+//-------------------------------------------------
+// FILE: meta_vehicle.bhv
+// NAME: Charles Benjamin
+//-------------------------------------------------
+initialize MAVMOOS_HELM_OPERATION = none
+initialize MOOS_MANUAL_OVERRIDE = false
+
+//----------------------------------------------------
+// A point-goal operation transits to its fixed station and holds there.
+// Legacy/custom Waypoint missions continue through ordinary NAV acquisition.
+Behavior = BHV_StationKeep
+{
+  name = operation_point
+  pwt = 100
+  condition = MAVMOOS_HELM_OPERATION != none
+  updates = MAVMOOS_OPERATION_HOLD_UPDATE
+  station_pt = 0,0
+  center_activate = false
+  inner_radius = 1
+  outer_radius = 3
+  outer_speed = 1
+  transit_speed = 1
+}
+
+//----------------------------------------------------
+// Existing ordinary external altitude objective; stock helm is unchanged.
+Behavior = BHV_ConstantAltitude
+{
+  name = operation_height
+  pwt = 100
+  condition = MAVMOOS_HELM_OPERATION != none
+  altitude = $(HEIGHT)
+  duration = -1
+  updates = MAVMOOS_OPERATION_ALTITUDE_UPDATE
+}

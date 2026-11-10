@@ -1,0 +1,23 @@
+    <header class="page-intro">
+      <h1>Get started</h1>
+      <p class="lede">Build MAVMOOS from source and check that vehicle telemetry reaches MOOS.</p>
+    </header>
+    <div class="article section">
+      <section id="setup">
+        <h2>1. Build</h2>
+        <p>Put the <code>bin/</code> directory from your built MOOS-IvP checkout on <code>PATH</code>. Then clone MAVMOOS and build it.</p>
+        <pre><code>git clone https://github.com/cbenjamin23/mavmoos.git
+cd mavmoos
+./build.sh</code></pre>
+        <p>[[setup_guide]] if you need MOOS-IvP or the build tools.</p>
+      </section>
+      <section id="first-run">
+        <h2>2. Verify telemetry</h2>
+        <pre><code>ctest --test-dir build -R '^moos_normal$' --output-on-failure --no-tests=error</code></pre>
+        <p>A pass means a local test sender reached MOOS and MAVMOOS sent no MAVLink frames. The test starts and stops its own processes.</p>
+      </section>
+      <section id="simulator">
+        <h2>3. Try a simulated mission</h2>
+        <p>The [[copter_starter]] runs a short IvP Helm route through takeoff, guidance handback and landing on Apple Silicon macOS.</p>
+      </section>
+    </div>

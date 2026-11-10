@@ -1,0 +1,37 @@
+// Stock helm legs for the owned PX4 aircraft lifecycle.
+initialize DEPLOY = false
+initialize AIRCRAFT_LEG = $(INITIAL_LEG)
+initialize MOOS_MANUAL_OVERRIDE = false
+
+Behavior = BHV_Waypoint
+{
+  name = hover_leg
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AIRCRAFT_LEG = hover
+  speed = 2
+  capture_radius = 2
+  slip_radius = 4
+  points = 200,0
+}
+
+Behavior = BHV_Waypoint
+{
+  name = forward_leg
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AIRCRAFT_LEG = forward
+  speed = $(FORWARD_SPEED)
+  capture_radius = 2
+  slip_radius = 4
+  points = 350,0
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = home_relative_height
+  pwt = 100
+  condition = DEPLOY = true
+  altitude = $(HELM_HEIGHT)
+  duration = -1
+}

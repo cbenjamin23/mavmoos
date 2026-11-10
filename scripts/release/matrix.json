@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "baseline_cases": ["copter_operator", "rover_ground", "rover_boat", "plane_normal", "plane_takeover"],
+  "cases": {
+    "copter_hexa_operations": {"fixture": "copter_operations", "scenario": "hexa", "profile": "ArduCopter 4.6.3 hexa plus"},
+    "copter_octa_operations": {"fixture": "copter_operations", "scenario": "octa", "profile": "ArduCopter 4.6.3 octa plus"},
+    "copter_quad_auto": {"fixture": "copter_auto", "scenario": "quad", "profile": "ArduCopter 4.6.3 quad"},
+    "copter_hexa_auto": {"fixture": "copter_auto", "scenario": "hexa", "profile": "ArduCopter 4.6.3 hexa plus"},
+    "copter_octa_auto": {"fixture": "copter_auto", "scenario": "octa", "profile": "ArduCopter 4.6.3 octa plus"},
+    "rover_ground_mission": {"fixture": "rover_mission", "scenario": "ground", "profile": "ArduRover 04cf6486 ground"},
+    "rover_boat_mission": {"fixture": "rover_mission", "scenario": "boat", "profile": "ArduRover 04cf6486 motorboat-skid"},
+    "plane_lifecycle": {"fixture": "plane", "scenario": "lifecycle", "profile": "ArduPlane 4.6.3 conventional"},
+    "plane_native_autoland": {"fixture": "plane", "scenario": "native-autoland", "profile": "ArduPlane 4.7.2 conventional"},
+    "sub_vectored": {"fixture": "sub", "scenario": "vectored", "profile": "ArduSub 4.7.2 vectored"},
+    "sub_vectored_6dof": {"fixture": "sub", "scenario": "vectored_6dof", "profile": "ArduSub 4.7.2 vectored 6DOF"},
+    "quadplane_live": {"fixture": "quadplane", "scenario": "live", "profile": "ArduPlane 4.6.3 fixed-motor QuadPlane"},
+    "quadplane_native": {"fixture": "quadplane", "scenario": "live-auto", "profile": "ArduPlane 4.6.3 fixed-motor QuadPlane"},
+    "quadplane_hover": {"fixture": "quadplane", "scenario": "hover", "profile": "ArduPlane 4.6.3 fixed-motor QuadPlane hover adapter"},
+    "px4_quadrotor": {"fixture": "px4_aircraft", "scenario": "quadrotor", "profile": "PX4 1.17.0 SIH quad"},
+    "px4_fixed_wing": {"fixture": "px4_aircraft", "scenario": "fixed-wing", "profile": "PX4 1.17.0 SIH airplane"},
+    "px4_standard_vtol": {"fixture": "px4_aircraft", "scenario": "standard-vtol", "profile": "PX4 1.17.0 SIH standard VTOL"}
+  },
+  "stress_cases": [
+    "stress_copter", "stress_boat", "stress_plane", "stress_quadplane", "stress_sub", "stress_px4_vtol"
+  ],
+  "outside_release_matrix": {
+    "px4_ackermann": "Experimental opt-in. Its dedicated runner qualifies it separately."
+  }
+}

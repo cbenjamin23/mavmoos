@@ -1,0 +1,40 @@
+//-------------------------------------------------
+// FILE: meta_vehicle.bhv
+// NAME: Charles Benjamin
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+
+//----------------------------------------------------
+Behavior = BHV_ConstantHeading
+{
+  name = leg_ground_course
+  pwt = 100
+  condition = DEPLOY = true
+  heading = 90
+  duration = -1
+  updates = PLANE_COURSE_UPDATE
+}
+
+//----------------------------------------------------
+Behavior = BHV_ConstantSpeed
+{
+  name = cruise_envelope_intent
+  pwt = 100
+  condition = DEPLOY = true
+  speed = 22
+  duration = -1
+  updates = PLANE_SPEED_UPDATE
+}
+
+//----------------------------------------------------
+// Existing ordinary moos-ivp-uav-base behavior, also used by the Copter fixture.
+Behavior = BHV_ConstantAltitude
+{
+  name = height_above_home
+  pwt = 100
+  condition = DEPLOY = true
+  altitude = 65
+  duration = -1
+  updates = PLANE_HEIGHT_UPDATE
+}

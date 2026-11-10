@@ -1,0 +1,66 @@
+cmake_minimum_required(VERSION 3.24)
+project(MAVMOOSExternalObserverExample LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+get_filename_component(example_checkout "${CMAKE_CURRENT_SOURCE_DIR}/../.." ABSOLUTE)
+set(MAVMOOS_SOURCE_ROOT "${example_checkout}" CACHE PATH "Matching MAVMOOS checkout; no copied SDK")
+set(api "${MAVMOOS_SOURCE_ROOT}/src/libmavmoos_runtime")
+if(NOT EXISTS "${api}/Plugin.h" OR NOT EXISTS "${api}/PluginHost.cpp")
+  message(FATAL_ERROR "Supply the exact matching MAVMOOS_SOURCE_ROOT")
+endif()
+include(FetchContent)
+set(MAVMOOS_MAVLINK_ARCHIVE "" CACHE FILEPATH "Optional local pinned MAVLink source archive")
+set(mavlink_url "https://codeload.github.com/mavlink/c_library_v2/tar.gz/a2d0ecf011a4aaa7840480e43f4e38d8c9e79d29")
+if(MAVMOOS_MAVLINK_ARCHIVE)
+  set(mavlink_url "${MAVMOOS_MAVLINK_ARCHIVE}")
+endif()
+FetchContent_Declare(mavlink URL "${mavlink_url}"
+  URL_HASH SHA256=3fc41a3cd46717b1aa226b958aed0829fbe7b7c9793bc8ffdcca76345a9dfde3
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE)
+FetchContent_MakeAvailable(mavlink)
+
+option(MAVMOOS_EXAMPLE_SANITIZERS "Instrument the example and its pure loader fixture" OFF)
+if(MAVMOOS_EXAMPLE_SANITIZERS)
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,undefined)
+endif()
+function(observer_module target)
+  add_library(${target} MODULE HeartbeatObserver.cpp)
+  set_target_properties(${target} PROPERTIES PREFIX "" LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/plugins")
+  target_include_directories(${target} PRIVATE "${api}")
+  target_include_directories(${target} SYSTEM PRIVATE "${mavlink_SOURCE_DIR}")
+  target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic)
+endfunction()
+observer_module(mavmoos_example_heartbeat_observer)
+
+include(CTest)
+if(BUILD_TESTING)
+  observer_module(example_wrong_abi)
+  target_compile_definitions(example_wrong_abi PRIVATE MAVMOOS_EXAMPLE_ABI_DELTA=1)
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+  add_executable(example_observer_probe ContractProbe.cpp "${api}/PluginHost.cpp")
+  target_include_directories(example_observer_probe PRIVATE "${api}")
+  target_include_directories(example_observer_probe SYSTEM PRIVATE "${mavlink_SOURCE_DIR}")
+  target_link_libraries(example_observer_probe PRIVATE ${CMAKE_DL_LIBS})
+  target_compile_options(example_observer_probe PRIVATE -Wall -Wextra -Wpedantic)
+  add_test(NAME external_observer_contract COMMAND "${Python3_EXECUTABLE}" -B
+    "${CMAKE_CURRENT_SOURCE_DIR}/ContractTests.py" --driver $<TARGET_FILE:example_observer_probe>
+    --module $<TARGET_FILE:mavmoos_example_heartbeat_observer> --wrong-abi $<TARGET_FILE:example_wrong_abi>)
+  set_tests_properties(external_observer_contract PROPERTIES TIMEOUT 20)
+endif()
+
+file(SHA256 "${api}/Plugin.h" api_sha)
+file(SHA256 "${api}/PluginHost.h" loader_header_sha)
+file(SHA256 "${api}/PluginHost.cpp" loader_sha)
+file(SHA256 "${api}/ControlBackend.h" backend_header_sha)
+file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/HeartbeatObserver.cpp" module_source_sha)
+file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/ContractProbe.cpp" probe_source_sha)
+file(SHA256 "${CMAKE_CURRENT_SOURCE_DIR}/ContractTests.py" contracts_source_sha)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+  "${api}/Plugin.h" "${api}/PluginHost.h" "${api}/PluginHost.cpp" "${api}/ControlBackend.h"
+  "${CMAKE_CURRENT_SOURCE_DIR}/HeartbeatObserver.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/ContractProbe.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/ContractTests.py")
+file(WRITE "${CMAKE_BINARY_DIR}/example-inputs.json"
+  "{\"schema\":1,\"api_sha256\":\"${api_sha}\",\"loader_header_sha256\":\"${loader_header_sha}\",\"loader_sha256\":\"${loader_sha}\",\"backend_header_sha256\":\"${backend_header_sha}\",\"module_source_sha256\":\"${module_source_sha}\",\"probe_source_sha256\":\"${probe_source_sha}\",\"contracts_source_sha256\":\"${contracts_source_sha}\",\"mavlink_revision\":\"a2d0ecf011a4aaa7840480e43f4e38d8c9e79d29\",\"scope\":\"configuration input identities, not build or vehicle qualification\"}\n")

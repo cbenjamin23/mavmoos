@@ -1,0 +1,29 @@
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+
+Behavior = BHV_ConstantHeading
+{
+  name = east_course
+  pwt = 100
+  condition = DEPLOY = true
+  heading = 90
+  duration = -1
+}
+
+Behavior = BHV_ConstantSpeed
+{
+  name = nominal_speed
+  pwt = 100
+  condition = DEPLOY = true
+  speed = 22
+  duration = -1
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = height_above_home
+  pwt = 100
+  condition = DEPLOY = true
+  altitude = 65
+  duration = -1
+}

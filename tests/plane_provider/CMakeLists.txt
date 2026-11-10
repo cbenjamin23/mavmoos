@@ -1,0 +1,7 @@
+add_executable(plane_backend_tests PlaneBackendTests.cpp)
+target_link_libraries(plane_backend_tests PRIVATE mavmoos_plane_components)
+add_test(NAME plane_backend COMMAND plane_backend_tests)
+
+add_executable(plane_control_tests PlaneControlTests.cpp)
+target_link_libraries(plane_control_tests PRIVATE mavmoos_runtime mavmoos_plane_components)
+add_test(NAME plane_control COMMAND plane_control_tests $<TARGET_FILE:mavmoos_arduplane_control>)

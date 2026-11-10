@@ -1,0 +1,59 @@
+{
+  "result": "PASS",
+  "source_revision": "fa07e5ec8fc2f8f8e2413996ce606438d2f9173b",
+  "stages": 30,
+  "software_required": 162,
+  "software_executed": 165,
+  "package_modules": 36,
+  "native_sitl_scenarios": 28,
+  "cases": [
+    "software",
+    "linux_kit",
+    "copter_operator",
+    "rover_ground",
+    "rover_boat",
+    "plane_normal",
+    "plane_takeover",
+    "copter_hexa_operations",
+    "copter_octa_operations",
+    "copter_quad_auto",
+    "copter_hexa_auto",
+    "copter_octa_auto",
+    "rover_ground_mission",
+    "rover_boat_mission",
+    "plane_lifecycle",
+    "plane_native_autoland",
+    "sub_vectored",
+    "sub_vectored_6dof",
+    "quadplane_live",
+    "quadplane_native",
+    "quadplane_hover",
+    "px4_quadrotor",
+    "px4_fixed_wing",
+    "px4_standard_vtol",
+    "stress_copter",
+    "stress_boat",
+    "stress_plane",
+    "stress_quadplane",
+    "stress_sub",
+    "stress_px4_vtol"
+  ],
+  "independent_replays_equal": true,
+  "release_result_sha256": "3c9194b8169ab285c04f5ef0e400383409e81d613c4bf422892e53ba6ab93467",
+  "archive": {
+    "bytes": 308137808,
+    "sha256": "5a048e3b4ab98ac1a1c51c8690e6fce7702080a2f670c6136c19f7995496a97f",
+    "path": "mavmoos-evidence/2026-11-10-release-28-fa07e5e.zip"
+  },
+  "archive_files_verified": 2350,
+  "stock_moos_postflight": {
+    "revision": "023fb54e00692611ecee2cd6f1138d10eec2127e",
+    "pHelmIvP": {
+      "bytes": 3548680,
+      "sha256": "5b3d2e705609c37b5b5000384655b4491010d6d797b94c43830d9972e684a876"
+    },
+    "clean": true
+  },
+  "hardware": false,
+  "restored_archive_replay_verified": true
+}

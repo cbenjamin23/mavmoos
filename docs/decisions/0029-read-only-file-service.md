@@ -1,0 +1,11 @@
+# 0029 — A rooted, read-only MAVLink file provider
+
+November 6, 2026. Implemented for a dedicated disarmed Copter SITL bench. Exact qualification · [Operator contract](../plugins/mavlink_files.md)
+
+Use the standard MAVLink FTP list, read-only open, sequential read and same-session close operations on the pinned server. MAVROS provides protocol structure and precedent for listing, sessions and EOF. Use the pinned ArduPilot worker to settle client-selected session, request sequence, cache, offsets and reply details. The provider issues one logical packet at a time with bounded attempts and an original expiry. It admits one download per fresh list. It exposes a file only after matched content length, explicit EOF, the matching session-close ACK and local exclusive release.
+
+The host keeps the sole UDP route, queue and final effect check. The active bench composes only telemetry and files, requires current disarmed/on-ground evidence and the exact owned Copter endpoint, and proves the private simulator working directory and root before a send. No route or physical transport is opened by a plugin. The host retires one obsolete retry by exact token if an earlier valid reply wins. On cancel or expiry only a bounded close of the same previously opened session can survive. Receipt uncertainty remains explicit when a known close cannot be observed. Never reset other sessions.
+
+Provide an optional typed C++ file service and result listener in the standard host. Keep the existing Plugin and Services interface layout and development ABI 10, so unrelated existing providers need no interface migration. Outside this bench there is no file egress, no destructive or write opcode, no burst, and no automatic peer or path selection. The app downloads into an owner-private directory with an exclusive local name and reports uncertainty if storage rollback cannot be proven.
+
+Keep the grouped generated app checks and the actual disarmed file witness separate. This adds one native case to the full local inventory and leaves the fast smoke tier at one Copter lifecycle. The archive binds the fixture to a pinned app, module, firmware, socket capture, released bytes and independent ground witness.

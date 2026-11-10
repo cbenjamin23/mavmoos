@@ -1,0 +1,30 @@
+// Stock Ackermann course. Waypoint completion selects the steering leg.
+initialize DEPLOY = false
+initialize ROVER_LEG = straight
+initialize MOOS_MANUAL_OVERRIDE = false
+
+Behavior = BHV_Waypoint
+{
+  name = entry_transect
+  pwt = 100
+  condition = DEPLOY = true
+  condition = ROVER_LEG = straight
+  speed = 1
+  capture_radius = 1.3
+  slip_radius = 2.3
+  points = $(CORNER)
+  endflag = ROVER_LEG = turn
+}
+
+Behavior = BHV_Waypoint
+{
+  name = bend_transect
+  pwt = 100
+  condition = DEPLOY = true
+  condition = ROVER_LEG = turn
+  speed = 1
+  capture_radius = 1.3
+  slip_radius = 2.3
+  wpt_index_var = AUTONOMY_INDEX
+  points = $(BEND):$(EXIT):$(OVERRUN)
+}

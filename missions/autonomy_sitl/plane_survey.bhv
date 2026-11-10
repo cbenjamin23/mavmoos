@@ -1,0 +1,62 @@
+//-------------------------------------------------
+// FILE: plane_survey.bhv
+// NAME: MAVMOOS project
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+initialize AUTONOMY_STAGE = survey
+initialize BHV_ERROR_SEEN = false
+
+Behavior = BHV_Waypoint
+{
+  name = survey_track
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = survey
+  updates = AUTONOMY_ROUTE
+  points = 300,300:500,350
+  speed = 22
+  capture_radius = 35
+  slip_radius = 55
+  endflag = AUTONOMY_STAGE = return
+}
+
+Behavior = BHV_Waypoint
+{
+  name = homeward_leg
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = return
+  points = 0,0
+  speed = 22
+  capture_radius = 45
+  slip_radius = 65
+  endflag = AUTONOMY_STAGE = done
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = survey_height
+  pwt = 100
+  condition = DEPLOY = true
+  altitude = 65
+  duration = -1
+}
+
+Behavior = BHV_ConstantHeading
+{
+  name = interim_course
+  pwt = 1
+  condition = DEPLOY = true
+  heading = 180
+  duration = -1
+}
+
+Behavior = BHV_ConstantSpeed
+{
+  name = interim_speed
+  pwt = 1
+  condition = DEPLOY = true
+  speed = 22
+  duration = -1
+}

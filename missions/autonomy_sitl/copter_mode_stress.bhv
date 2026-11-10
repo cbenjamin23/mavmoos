@@ -1,0 +1,69 @@
+//-------------------------------------------------
+// FILE: copter_mode_stress.bhv
+// NAME: MAVMOOS SITL
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+initialize SURVEY_DONE = false
+initialize STRESS_RESUME = false
+initialize SITL_ROUTE_FINISHED = false
+initialize BHV_ERROR_SEEN = false
+
+//----------------------------------------------------
+Behavior = BHV_Waypoint
+{
+  name = outbound_survey
+  pwt = 100
+  condition = DEPLOY = true
+  condition = SURVEY_DONE = false
+  points = 0,8
+  endflag = SURVEY_DONE = true
+  speed = 1.5
+  capture_radius = 1.5
+  slip_radius = 3
+  repeat = 0
+}
+
+//----------------------------------------------------
+Behavior = BHV_Waypoint
+{
+  name = revised_return_survey
+  pwt = 100
+  condition = DEPLOY = true
+  condition = SURVEY_DONE = true
+  condition = STRESS_RESUME = true
+  condition = SITL_ROUTE_FINISHED = false
+  activeflag = SURVEY_RETURNING = true
+  updates = SURVEY_UPDATE
+  points = 0,8:0,4:0,0
+  wpt_index_var = SURVEY_INDEX
+  endflag = SITL_ROUTE_FINISHED = true
+  speed = 1.5
+  capture_radius = 1.5
+  slip_radius = 3
+  repeat = 0
+}
+
+//----------------------------------------------------
+Behavior = BHV_StationKeep
+{
+  name = survey_station
+  pwt = 1
+  condition = DEPLOY = true
+  station_pt = 0,0
+  center_activate = false
+  inner_radius = 0.8
+  outer_radius = 2.5
+  outer_speed = 1
+  transit_speed = 1
+}
+
+//----------------------------------------------------
+Behavior = BHV_ConstantAltitude
+{
+  name = flight_height
+  pwt = 100
+  condition = DEPLOY = true
+  altitude = 5
+  duration = -1
+}

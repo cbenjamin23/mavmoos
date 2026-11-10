@@ -1,0 +1,43 @@
+//-------------------------------------------------
+// FILE: meta_observer.moos
+// NAME: Charles Benjamin
+//-------------------------------------------------
+ServerHost = localhost
+ServerPort = $(MOOS_PORT)
+Community = external_observer
+MOOSTimeWarp = 1
+TERM_REPORTING = false
+
+//----------------------------------------------------
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 50
+  Run = MOOSDB @ NewConsole = false
+  Run = $(APP_PATH) @ NewConsole = false
+}
+
+//----------------------------------------------------
+ProcessConfig = iMAVLink
+{
+  AppTick = 50
+  CommsTick = 50
+  bind_address = 127.0.0.1
+  bind_port = $(BIND_PORT)
+  peer_address = 127.0.0.1
+  peer_port = $(PEER_PORT)
+  target_system = 1
+  target_component = 1
+  expected_type = 2
+  expected_autopilot = 3
+  vehicle_profile = arducopter
+  simulation_only = false
+  shadow_mode = false
+  helm_enabled = false
+  firmware_requests = false
+  heartbeat_timeout = 2
+  publish_interval = 0.1
+  plugin_directory = $(PLUGIN_DIRECTORY)
+  plugins = example_heartbeat_observer
+  plugin.example_heartbeat_observer.sample_timeout = $(SAMPLE_TIMEOUT)
+  plugin.example_heartbeat_observer.publish_interval = $(PUBLISH_INTERVAL)
+}

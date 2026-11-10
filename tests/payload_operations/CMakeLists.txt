@@ -1,0 +1,3 @@
+add_executable(payload_operations_moos_probe PayloadMoosProbe.cpp)
+target_link_libraries(payload_operations_moos_probe PRIVATE ${MOOS_LIBRARIES})
+target_compile_options(payload_operations_moos_probe PRIVATE -Wall -Wextra -Wpedantic)

@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "kind": "mavmoos.scenario_fixtures",
+  "qualification": "not_inferred",
+  "binding": {
+    "profile_id": "arducopter-4.6.3-quad",
+    "firmware_manifest_sha256": "decd934de8057bcc363b273fddd5cc806475fabe9e64475512df71e8f14a3639",
+    "source_revision": "92b0cd788ec29406f26c6f9c31d5ceedbd1cc538",
+    "vehicle_profile": "arducopter"
+  },
+  "fixtures": {
+    "armed_wiped_mission_read": {
+      "shape": "empty",
+      "expected_count": 0,
+      "mission_type": 0,
+      "required_host_message_ids": [
+        43,
+        47
+      ],
+      "forbidden_host_message_ids": [
+        51
+      ],
+      "compare_item_to_bound_home": false,
+      "item_records_exercised": 0,
+      "preconditions": [
+        "fresh_isolated_storage",
+        "wipe_before_boot",
+        "ordinary_arm",
+        "no_mission_mutation_or_execution",
+        "bound_home_observation"
+      ]
+    },
+    "downward_distance": {
+      "physical_min_m": 0.1,
+      "physical_max_m": 30,
+      "native_units": "cm",
+      "preboot_parameters": {
+        "RNGFND1_MIN_CM": 10,
+        "RNGFND1_MAX_CM": 3000
+      },
+      "reported_min_cm": 10,
+      "reported_max_cm": 3000,
+      "orientation": 25,
+      "instance": 0
+    }
+  }
+}

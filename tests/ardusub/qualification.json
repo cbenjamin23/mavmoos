@@ -1,0 +1,178 @@
+{
+  "schema": 1,
+  "date": "2026-11-06",
+  "profile": "ardusub_control",
+  "scope": "Pinned native vectored ArduSub with synthetic absolute navigation and stock depth helm in owned loopback SITL.",
+  "hardware": false,
+  "raw_artifact_base": "outputs/mavmoos-worktrees/remaining-sub/build-sub",
+  "attempts": [
+    {
+      "directory": "native-attempt01",
+      "scope": "preflight",
+      "result": "FAIL",
+      "note": "Disabled the two simulator GPS serial slots. Absolute EKF navigation and home never became ready.",
+      "receipt_sha256": "9cffe84c00ad416678260ce6200a9d983d2ab4eae41d95fc729e6ea62267fcce",
+      "cleanup_proven": true
+    },
+    {
+      "directory": "native-attempt02",
+      "scope": "preflight",
+      "result": "FAIL",
+      "note": "GPS and home recovered, but the 25 s deadline ended with the EKF still in constant-position mode.",
+      "receipt_sha256": "934a1ea75c01820c3fb326066b565cc0fe2404e2d94ee621490380e58642c1ea",
+      "cleanup_proven": true
+    },
+    {
+      "directory": "native-attempt03",
+      "scope": "native",
+      "result": "FAIL",
+      "note": "EKF, Position Hold and ordinary arm succeeded. The mission omitted the explicit ArduPilot heartbeat identity and the bridge did not initialize. Unknown HOME_POSITION quaternion values exposed a strict JSON receipt error. Raw logs retained.",
+      "witness_sha256": {
+        "failure.log": "a6401c669859c6270b6a35566ea5fe94a5c2755e03fe03477b3e11b25ba9ec66",
+        "pantler.log": "2ab67d56afdf8a1c3c0cfb555faebfcf529714d2c44cb0ad0784e65baa66addd",
+        "monitor-rx.jsonl": "860d3a70890929ca15cfc13592905efe31b93e0bb100fdf4495ee85abdba69f9",
+        "moos.jsonl": "fc491c9255647192730ee36b6f9036d80a3b8bd1660d3843d73e9df224b26fe8",
+        "operator-tx.jsonl": "e526716826744f7f1e98942f0c9c5829cd7cb08789f56a4c4c288e3a987ab777",
+        "targ_sub.moos": "16ad31544d83e06119ddfafd7e707910defd4046514702144b6164e4afe581a7"
+      }
+    },
+    {
+      "directory": "native-attempt04",
+      "scope": "native, earlier capture",
+      "result": "PASS",
+      "note": "The complete workflow passed with the earlier global hold. The pinned firmware accepts global Z targets in native Depth Hold, so this run does not qualify the final capture format.",
+      "receipt_sha256": "7984a2004cbebe7dca3b900a8ce18726b896c3817491c5d66c29fced747c163a",
+      "cleanup_proven": true
+    },
+    {
+      "directory": "native-attempt05",
+      "scope": "native, final capture",
+      "result": "PASS",
+      "note": "The complete workflow passed with a zero-offset local capture and onboard FC evidence of the accepted position target.",
+      "receipt_sha256": "2af15dfbd870a34ed05a64d310ffba4277d4621fec4785129d573030646cad24",
+      "cleanup_proven": true
+    }
+  ],
+  "final": {
+    "result": "PASS",
+    "firmware_source": "92b0cd788ec29406f26c6f9c31d5ceedbd1cc538",
+    "firmware_label": "ArduSub V4.6.0-dev",
+    "moos_source": "023fb54e00692611ecee2cd6f1138d10eec2127e",
+    "app_source": "89564cc5fa156f51ca9120e513f1617867fd2b3f",
+    "fixture_source": "89564cc5fa156f51ca9120e513f1617867fd2b3f",
+    "input_sha256": {
+      "simulator": "994970cc4d69145d537e4bae48c5ef8a5a254626c30c924151a1ab2b8cc3d5f8",
+      "defaults": "4e859049a16e4577bdd3b09be0f7b7b2c7c086f1e15a03e93835c4f1b4aca728",
+      "helm": "5b3d2e705609c37b5b5000384655b4491010d6d797b94c43830d9972e684a876",
+      "db": "31c247e5711c2d0f4037d2ff987eec23793870f6e90effb6d2ef765f88bd9861",
+      "antler": "1e2692e4d440163c603442669af4516cd92f3f75efa4dec72da305f29eca71c7",
+      "nsplug": "da230cd7dbbdbe72835c43769cf60e86099026b387848159189e4835a472179c",
+      "runner": "36ded5d3a13aaea6c00741ed2a5fedb77690a16c2ca22c4c2b2d9e67ce092920",
+      "app": "2c310d3be46681bd4b8ec10fd28e8bf17adc3b652fb92d80eb038b0cc6ef24c4",
+      "probe": "d3684e1b7e23517f4ee4168c39dafbb19c55cbdb57fa9ebdf8dd92b103a73c5f",
+      "sub_plugin": "9f51832d68387f68991f8653fbe4b2c4bb175096d7cccb1a37617b714374fa39",
+      "telemetry_plugin": "47dd214f1c045eaafea43eab65718b4acc603c75055bba252c1c8009de246682",
+      "moos_template": "193ebe0388ebfb68998433e839940614e6aa4cce87722d9fa495d4a09b6bced8",
+      "bhv_template": "2e3f0b74ea3994e83dc32c58839c6b7d283d564eee598b3cde790467ddfe9177"
+    },
+    "boot_ekf_flags": 831,
+    "parameter_readback": {
+      "FRAME_CONFIG": 1.0,
+      "FS_PILOT_INPUT": 0.0,
+      "FS_GCS_ENABLE": 3.0,
+      "FS_GCS_TIMEOUT": 2.5,
+      "ARMING_CHECK": 1.0,
+      "SYSID_MYGCS": 245.0
+    },
+    "initial_mode": 16,
+    "ordinary_arm": true,
+    "post_acquisition_mode": 4,
+    "stock_course_deg": 90.0,
+    "stock_speed_mps": 0.7,
+    "stock_depth_m": 2.0,
+    "home_altitude_msl_m": -0.05,
+    "transit_east_m": 3.0073080295770533,
+    "transit_north_m": -0.0111195,
+    "observed_depth_m": 1.934,
+    "stale_helm": {
+      "captured_hold_readback": {
+        "file": "logs/00000001.BIN",
+        "target": {
+          "mavpackettype": "GUIP",
+          "TimeUS": 53611880,
+          "Type": 0,
+          "pX": 0.2966914474964142,
+          "pY": 344.686767578125,
+          "pZ": -186.187255859375,
+          "vX": 0.0,
+          "vY": 0.0,
+          "vZ": 0.0
+        },
+        "position": {
+          "mono": 3610042.616048958,
+          "datagram_offset": 244345,
+          "datagram_length": 40,
+          "mavpackettype": "LOCAL_POSITION_NED",
+          "time_boot_ms": 53629,
+          "x": 0.003062682691961527,
+          "y": 3.4555537700653076,
+          "z": 1.8625314235687256,
+          "vx": -0.0028092442080378532,
+          "vy": 0.4897649586200714,
+          "vz": 0.018875792622566223
+        },
+        "error_m": 0.008711573251610273
+      },
+      "measured_horizontal_drift_m": 0.09860026310791042,
+      "measured_depth_drift_m": 0.003,
+      "recovered_output_kept_grant_retired": true
+    },
+    "native_handback": "id=sub-hold-1,status=CONFIRMED,reason=native_position_hold_observed",
+    "native_link_loss_mode": 2,
+    "native_link_loss_observed_s_after_pause": 1.9512930419296026,
+    "bridge_recovery_kept_grant_retired": true,
+    "pilot_takeover_mode": 19,
+    "pilot_takeover_navigation_counter_frozen": 72,
+    "ordinary_disarm": true,
+    "owned_processes_remaining": [],
+    "ports_clear": {
+      "bridge": true,
+      "monitor": true,
+      "operator": true,
+      "db": true,
+      "base": true,
+      "rc": true,
+      "irlock": true,
+      "bridge_peer": true,
+      "monitor_peer": true,
+      "operator_peer": true
+    },
+    "cleanup_proven": true,
+    "input_drift": [],
+    "raw_file_sha256": {
+      "bridge-rx.jsonl": "f2143abd59a71bd7dcd93e22186e5426a5e2575b290a98369d48b198e47d2dcb",
+      "bridge-rx.mavlink": "e3d270a03297d1bb21c78a938c94214e9f30b35d7f26c830306a9f525d4cf5b8",
+      "eeprom.bin": "eeec4f4f2c160e4f4dbdb051ab3fbdcd877ff8b0e43e7aa5f760fad0d0f68a73",
+      "events.jsonl": "0b8632e1d57ae8a1711992067f6745507d594defdcbbc85f9cead6d5828ba5f5",
+      "fixture.parm": "6c434fc8687562afd106a33e3b8af79c091cfdfa623050b0c108369e9dffb128",
+      "logs/00000001.BIN": "cb5c09b1ce46c108d97ef11239bab20b61f67e1b7458f774201708f7dfdf4f1b",
+      "logs/LASTLOG.TXT": "f1b2f662800122bed0ff255693df89c4487fbdcf453d3524a42d4ec20c3d9c04",
+      "message-intervals-chan0.txt": "af379859d15ce85f3061964b5088727174f6d72240be1918407120a3feb2103a",
+      "message-intervals-chan1.txt": "af379859d15ce85f3061964b5088727174f6d72240be1918407120a3feb2103a",
+      "message-intervals-chan2.txt": "af379859d15ce85f3061964b5088727174f6d72240be1918407120a3feb2103a",
+      "monitor-rx.jsonl": "1431bc6f52bb19277729beaecaa90a8405fd9dac0a1421c3f88e798ece6edb07",
+      "monitor-rx.mavlink": "da529e0e6d8004b9a388404761aa0ee336537346805cffae4287a573be9274b3",
+      "moos.jsonl": "e650841237af02e7b399d1f4fd1e3ae6f4bf5003332778057ca21f1c01968674",
+      "operator-rx.jsonl": "7b940174f0bf5960e367656bb691d69dbd37779a1cf530cd8c6a170e9cea049c",
+      "operator-rx.mavlink": "5e40a7812f1faf21c1cf50bc27ac5b0b4a4c659449607c5c7999e9f53240a2f1",
+      "operator-tx.jsonl": "66a29eec54020cc68a4de093e38e4fca7f5f52a9492f14a9878e61eea1d0a5bb",
+      "ownership.jsonl": "16fe678584b3fbb450992c1fa9c98aa59cff1014ed11cd90b58bb5c068eec44b",
+      "pantler.log": "85f59eaaa8bee3547090940df17fc93a08551d915a52585a48aa5a65f6c197ae",
+      "probe.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "probe.stdout": "2243f2868c529a6e4725e236ca88d562976c677abcda04025e3bab2efcfac24a",
+      "sitl.log": "782cde95dfbd53e20910476ebb85adc5385c5aaf66228b3864292757e3739b25",
+      "targ_sub.bhv": "e6a11a529bcb5e59b89094df2f3f9b14c5ae56935e1e2a5b24917ad960c61842",
+      "targ_sub.moos": "4e2aa498b9b963575ab5b52857d924ede5445e46ceeac647fd186a5310d6bb6b"
+    }
+  }
+}

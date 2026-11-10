@@ -1,0 +1,51 @@
+//-------------------------------------------------
+// FILE: meta_vehicle.bhv
+// NAME: Charles Benjamin
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize ROUTE_COMPLETE = false
+initialize MOOS_MANUAL_OVERRIDE = false
+
+//----------------------------------------------------
+Behavior = BHV_Waypoint
+{
+  name = copter_route
+  pwt = 100
+  condition = DEPLOY = true
+  condition = ROUTE_COMPLETE = false
+  endflag = ROUTE_COMPLETE = true
+  points = 0,7:5,7
+  speed = 1.5
+  capture_radius = 1.5
+  slip_radius = 3
+  lead = 2
+  lead_to_start = true
+  repeat = 0
+}
+
+//----------------------------------------------------
+// Keep a small horizontal objective available while the waypoint
+// behavior posts its endflag. The same fixed point owns stationkeeping
+// after the route relinquishes course and speed.
+Behavior = BHV_StationKeep
+{
+  name = route_finished_hold
+  pwt = 1
+  condition = DEPLOY = true
+  station_pt = 5,7
+  center_activate = false
+  inner_radius = 1
+  outer_radius = 3
+  outer_speed = 1
+  transit_speed = 1
+}
+
+//----------------------------------------------------
+Behavior = BHV_ConstantAltitude
+{
+  name = home_relative_height
+  pwt = 100
+  condition = DEPLOY = true
+  altitude = $(HEIGHT)
+  duration = -1
+}

@@ -1,0 +1,6 @@
+.DS_Store
+/build*/
+/bin/
+/Testing/
+__pycache__/
+.mavmoos-control-replay-*/

@@ -1,0 +1,44 @@
+
+// Ordinary mission-defined task routes selected by the Plane capability.
+Behavior = BHV_Waypoint
+{
+  name = selected_return_route
+  pwt = 100
+  condition = DEPLOY = true
+  condition = MAVMOOS_HELM_OPERATION = return
+  activeflag = MAVMOOS_HELM_TASK_READY=return
+  points = 0,0
+  speed = 22
+  capture_radius = 30
+  slip_radius = 60
+  perpetual = true
+  updates = MAVMOOS_OPERATION_RETURN_UPDATE
+}
+
+Behavior = BHV_Waypoint
+{
+  name = selected_survey_route
+  pwt = 100
+  condition = DEPLOY = true
+  condition = MAVMOOS_HELM_OPERATION = survey
+  activeflag = MAVMOOS_HELM_TASK_READY=survey
+  points = 220,350:220,550:420,550:420,350
+  speed = 22
+  capture_radius = 35
+  slip_radius = 70
+  perpetual = true
+}
+
+Behavior = BHV_Waypoint
+{
+  name = selected_voronoi_route
+  pwt = 100
+  condition = DEPLOY = true
+  condition = MAVMOOS_HELM_OPERATION = voronoi
+  activeflag = MAVMOOS_HELM_TASK_READY=voronoi
+  points = -220,350:-220,550:-420,550:-420,350
+  speed = 22
+  capture_radius = 35
+  slip_radius = 70
+  perpetual = true
+}

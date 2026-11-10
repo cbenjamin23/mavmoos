@@ -1,0 +1,39 @@
+//-------------------------------------------------
+// FILE: meta_vehicle.bhv
+// NAME: Charles Benjamin
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize ROUTE_COMPLETE = false
+initialize MOOS_MANUAL_OVERRIDE = false
+
+//----------------------------------------------------
+Behavior = BHV_Waypoint
+{
+  name = rover_route
+  pwt = 100
+  condition = DEPLOY = true
+  condition = ROUTE_COMPLETE = false
+  updates = WPT_UPDATE
+  endflag = ROUTE_COMPLETE = true
+  speed = $(SPEED)
+  capture_radius = 1.5
+  slip_radius = 3
+  lead = 2
+  lead_to_start = true
+  points = $(WAYPOINTS)
+  repeat = 0
+}
+
+//----------------------------------------------------
+Behavior = BHV_StationKeep
+{
+  name = route_finished_hold
+  pwt = 100
+  condition = DEPLOY = true
+  condition = ROUTE_COMPLETE = true
+  center_activate = true
+  inner_radius = 1
+  outer_radius = 3
+  outer_speed = 1
+  transit_speed = 1
+}

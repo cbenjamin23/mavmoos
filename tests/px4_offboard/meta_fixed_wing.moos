@@ -1,0 +1,81 @@
+//-------------------------------------------------
+// FILE: meta_fixed_wing.moos
+// NAME: MAVMOOS PX4 fixed-wing SITL test fixture
+//-------------------------------------------------
+ServerHost = localhost
+ServerPort = $(MOOS_PORT)
+Community = px4_fixed_wing
+MOOSTimeWarp = 1
+LatOrigin = $(LAT_ORIGIN)
+LongOrigin = $(LONG_ORIGIN)
+
+//----------------------------------------------------
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 80
+  Run = $(DB_PATH) @ NewConsole = false
+  Run = $(APP_PATH) @ NewConsole = false ~ iMAVLink
+  Run = $(HELM_PATH) @ NewConsole = false
+  Run = $(LOGGER_PATH) @ NewConsole = false
+}
+
+//----------------------------------------------------
+ProcessConfig = iMAVLink
+{
+  AppTick = 40
+  CommsTick = 40
+  bind_address = 127.0.0.1
+  bind_port = 14540
+  peer_address = 127.0.0.1
+  peer_port = 14580
+  target_system = 1
+  target_component = 1
+  expected_type = 1
+  expected_autopilot = 12
+  simulation_only = true
+  sitl_pid = $(SITL_PID)
+  shadow_mode = false
+  helm_enabled = true
+  control_helm = true
+  control_native_actions = false
+  vehicle_profile = px4_fixed_wing
+  plugins = telemetry,px4_control
+  plugin_directory = $(PLUGIN_DIRECTORY)
+  helm_source = pHelmIvP
+  freshness_timeout = 0.9
+  handoff_window = 0.9
+  field_spread = 0.25
+  nav_position_timeout = 0.5
+  firmware_requests = false
+  max_datagrams_per_iter = 96
+  max_queue_age = 0.25
+  lat_origin = $(LAT_ORIGIN)
+  long_origin = $(LONG_ORIGIN)
+}
+
+//----------------------------------------------------
+ProcessConfig = pHelmIvP
+{
+  AppTick = 10
+  CommsTick = 20
+  behaviors = targ_px4.bhv
+  domain = course:0:359:360
+  domain = speed:0:26:27
+  domain = altitude:0:120:121
+  start_in_drive = true
+  verbose = quiet
+  ivp_behavior_dir = $(BEHAVIOR_DIRECTORY)
+}
+
+//----------------------------------------------------
+ProcessConfig = pLogger
+{
+  AppTick = 10
+  CommsTick = 20
+  File = LOG_PX4_FIXED_WING
+  PATH = ./logs
+  SyncLog = false
+  AsyncLog = true
+  LogAuxSrc = true
+  WildCardLogging = true
+}

@@ -1,0 +1,28 @@
+//-------------------------------------------------
+// FILE: meta_fixed_wing.bhv
+// NAME: MAVMOOS PX4 fixed-wing SITL test fixture
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+
+//----------------------------------------------------
+Behavior = BHV_Waypoint
+{
+  name = eastbound
+  pwt = 100
+  condition = DEPLOY = true
+  speed = 16
+  capture_radius = 2
+  slip_radius = 4
+  points = 350,0
+}
+
+//----------------------------------------------------
+Behavior = BHV_ConstantAltitude
+{
+  name = home_relative_height
+  pwt = 100
+  condition = DEPLOY = true
+  altitude = 60
+  duration = -1
+}

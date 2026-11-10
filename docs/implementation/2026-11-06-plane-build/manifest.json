@@ -1,0 +1,70 @@
+{
+  "bundle_sha256": "7921d240d8e3ce3511586f22e9a7f519137978b37957449eac98e8d40934314a",
+  "executable": {
+    "bytes": 4357896,
+    "local_path": "/Users/charlesbenjamin/Documents/Codex/2026-10-28/check/outputs/mavmoos-worktrees/overnight-plane-preflight/build-plane-4.6.3-offline-01/source/build/sitl/bin/arduplane",
+    "sha256": "b977ff6cd559f6a6c3d16cfb57c1e32840291210eb593e4f7254fea701137fa5"
+  },
+  "files": {
+    "SHA256SUMS": {
+      "bytes": 2193,
+      "sha256": "cdb2a806592844a5e7a7e53dda7271764d4e9476fb3c15ab18bd337c2f937a32"
+    },
+    "build-attestation.json": {
+      "bytes": 5542,
+      "sha256": "3ddd2117e19fe1238e1d05cb483946a5c9801aea4c467f2fbdcac5d9f6e34a75"
+    },
+    "build-recipe.sh": {
+      "bytes": 6520,
+      "sha256": "2a3842d366c5e15960ec46a0f433ed67d639d97c263b2bd321859d2051c6d4fc"
+    },
+    "build.log": {
+      "bytes": 288640,
+      "sha256": "634ccdc3c5915cecfb9d35acd022dc1dcf0f2b875f2c73e9f71b67939e6f3548"
+    },
+    "configure.log": {
+      "bytes": 3527,
+      "sha256": "5fec621ed2d4e71ea749eaec4c670c03b44be280a2584e5a9515b34775190067"
+    },
+    "driver.log": {
+      "bytes": 533,
+      "sha256": "d7ff902bd8d80f4ccb6a6ebabab4492262fca9cf169e52c6be047f3d126212d7"
+    },
+    "executable-format.txt": {
+      "bytes": 31,
+      "sha256": "643cc5d2dac8a288bdceeae0d8057fecf55ce5eb10dd5ea30d2d48cc957c662b"
+    },
+    "export.log": {
+      "bytes": 5607,
+      "sha256": "d88cfb1d010513c5c51c08cdd66717d561c1b66cea9707703147ec9e0a2a3efe"
+    },
+    "snapshot.py": {
+      "bytes": 1188,
+      "sha256": "2a86da64465c534c57e6c667f94420ea300d1adae133e795aed77da3bee614b1"
+    },
+    "source-files.json": {
+      "bytes": 3569458,
+      "sha256": "d395f5fe3faba2c7d34bb85a390c40af50fcb312a195b7ae686ca571184752b5"
+    },
+    "toolchain.log": {
+      "bytes": 899,
+      "sha256": "9109750c10d11d2370955df50c18143b4da6b80e6d295220530885fc90bbfb2b"
+    },
+    "toolchain/gcc": {
+      "bytes": 70,
+      "sha256": "4bbea343134922c2c0367d69a647a6007c8c1765592ca7392b7ebe232f078677"
+    },
+    "verification.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "verify-build.py": {
+      "bytes": 6010,
+      "sha256": "d9b88e9fcf6dfdf7ff6fc80d8d78e4136be3e170075e1a0a4770255939e13cab"
+    }
+  },
+  "plane_revision": "3fc7011a7d3dc047cbb17d8bd98ee94577d144c6",
+  "result": "PASS",
+  "schema": 1,
+  "scope": "offline build and static verification only"
+}

@@ -1,0 +1,74 @@
+//-------------------------------------------------
+// FILE: plane_stress.bhv
+// NAME: MAVMOOS project
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+initialize AUTONOMY_STAGE = entry
+initialize BHV_ERROR_SEEN = false
+
+Behavior = BHV_Waypoint
+{
+  name = entry_gate
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = entry
+  updates = AUTONOMY_ROUTE
+  points = 300,300
+  speed = 22
+  capture_radius = 35
+  slip_radius = 45
+  endflag = AUTONOMY_STAGE = detour
+}
+
+Behavior = BHV_Waypoint
+{
+  name = revised_gate
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = detour
+  updates = AUTONOMY_DETOUR
+  points = 650,400
+  speed = 22
+  capture_radius = 35
+  slip_radius = 45
+  endflag = AUTONOMY_STAGE = done
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = initial_height
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = entry
+  altitude = 65
+  duration = -1
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = revised_height
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE != entry
+  altitude = 73
+  duration = -1
+}
+
+Behavior = BHV_ConstantHeading
+{
+  name = interim_course
+  pwt = 1
+  condition = DEPLOY = true
+  heading = 180
+  duration = -1
+}
+
+Behavior = BHV_ConstantSpeed
+{
+  name = interim_speed
+  pwt = 1
+  condition = DEPLOY = true
+  speed = 22
+  duration = -1
+}

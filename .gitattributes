@@ -1,0 +1,11 @@
+# Preserve archived tool output byte-for-byte; its whitespace is evidence.
+docs/implementation/**/evidence/**/*.log -whitespace
+docs/implementation/**/evidence/**/compiler-version.txt -whitespace
+docs/implementation/**/evidence/**/*.moos -whitespace
+docs/implementation/**/evidence/**/*.bhv -whitespace
+docs/implementation/**/evidence/**/*.patch -whitespace
+docs/implementation/**/evidence/**/*.txt -whitespace
+# New review/run packages also retain raw logs outside the older evidence layout.
+docs/design/2026-11-04-capability-plugins/evidence/**/*.log -whitespace
+docs/implementation/2026-11-04-capability-plugins/**/*.log -whitespace
+docs/implementation/2026-11-04-parallel-capabilities/**/*.log -whitespace

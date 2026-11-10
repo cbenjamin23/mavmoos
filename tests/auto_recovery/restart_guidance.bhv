@@ -1,0 +1,29 @@
+
+initialize MAVMOOS_RESTART_GUIDANCE = false
+
+Behavior = BHV_ConstantHeading
+{
+  name = restart_east
+  condition = MAVMOOS_RESTART_GUIDANCE = true
+  pwt = 100
+  heading = 90
+  duration = -1
+}
+
+Behavior = BHV_ConstantSpeed
+{
+  name = restart_cruise
+  condition = MAVMOOS_RESTART_GUIDANCE = true
+  pwt = 100
+  speed = 1.5
+  duration = -1
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = restart_height
+  condition = MAVMOOS_RESTART_GUIDANCE = true
+  pwt = 100
+  altitude = 5
+  duration = -1
+}

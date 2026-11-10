@@ -1,0 +1,17 @@
+add_executable(external_navigation_provider_tests ExternalNavigationPluginTests.cpp)
+target_include_directories(external_navigation_provider_tests PRIVATE
+  "${PROJECT_SOURCE_DIR}/src/libmavmoos_runtime")
+target_link_libraries(external_navigation_provider_tests PRIVATE mavlink_headers ${CMAKE_DL_LIBS})
+add_test(NAME external_navigation_provider COMMAND external_navigation_provider_tests
+  $<TARGET_FILE:mavmoos_external_navigation>)
+set_tests_properties(external_navigation_provider PROPERTIES TIMEOUT 15)
+
+add_executable(external_navigation_moos_probe ExternalNavigationMoosProbe.cpp)
+target_link_libraries(external_navigation_moos_probe PRIVATE ${MOOS_LIBRARIES})
+target_compile_options(external_navigation_moos_probe PRIVATE -Wall -Wextra -Wpedantic)
+
+add_executable(external_navigation_runtime_tests ExternalNavigationRuntimeTests.cpp)
+target_link_libraries(external_navigation_runtime_tests PRIVATE mavmoos_runtime)
+add_test(NAME external_navigation_runtime COMMAND external_navigation_runtime_tests
+  $<TARGET_FILE:mavmoos_telemetry> $<TARGET_FILE:mavmoos_external_navigation> $<TARGET_FILE:mavmoos_parameters>)
+set_tests_properties(external_navigation_runtime PROPERTIES TIMEOUT 15)

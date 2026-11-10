@@ -1,0 +1,67 @@
+//-------------------------------------------------
+// FILE: sub_transect.bhv
+// NAME: MAVMOOS project
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+initialize AUTONOMY_STAGE = shallow
+initialize BHV_ERROR_SEEN = false
+
+Behavior = BHV_Waypoint
+{
+  name = shallow_transit
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = shallow
+  points = 5,0
+  speed = 0.7
+  capture_radius = 0.8
+  slip_radius = 1.4
+  endflag = AUTONOMY_STAGE = deep
+}
+
+Behavior = BHV_Waypoint
+{
+  name = deep_transect
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = deep
+  points = 5,5:1,5
+  speed = 0.7
+  capture_radius = 0.8
+  slip_radius = 1.4
+  endflag = AUTONOMY_STAGE = done
+}
+
+Behavior = BHV_ConstantDepth
+{
+  name = initial_depth
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE = shallow
+  depth = 2
+  duration = -1
+}
+
+Behavior = BHV_ConstantDepth
+{
+  name = work_depth
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AUTONOMY_STAGE != shallow
+  depth = 3
+  duration = -1
+}
+
+Behavior = BHV_StationKeep
+{
+  name = pickup_station
+  pwt = 1
+  condition = DEPLOY = true
+  station_pt = 1,5
+  center_activate = false
+  inner_radius = 0.7
+  outer_radius = 2
+  outer_speed = 0.4
+  transit_speed = 0.5
+}

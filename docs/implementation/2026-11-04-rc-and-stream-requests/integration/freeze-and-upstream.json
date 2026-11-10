@@ -1,0 +1,36 @@
+{
+  "result": "PASS",
+  "production_ref": "350abe15e6b28be8d581d8743237afe0eaead6cd",
+  "normal_artifacts": {
+    "build-rc-stream-host/bin/iMAVLink": "8b4230540b70249cc6927855040f0ab3c0886e069d488267a2506004e7a9c5b1",
+    "build-rc-stream-host/bin/rc_io_moos_probe": "920222d4efd07a454c05063976273c7d7b72e8c67174ec1d8e45ef935ee74619",
+    "build-rc-stream-host/plugins/mavmoos_arducopter_control.so": "1c02eb439bf064c793d40d121e6bebefb546cc69b04fd8b194cc821ae4073e53",
+    "build-rc-stream-host/plugins/mavmoos_ardurover_control.so": "23ca6961e737bb2fd9eafe4a11fe01f4b6e5c2c6ee5b7cbbf1b32971664e6415",
+    "build-rc-stream-host/plugins/mavmoos_attitude.so": "cad30aafb9568dfc9d83b3fdfa456bdbc8e42321d1eb237423450e26135e4204",
+    "build-rc-stream-host/plugins/mavmoos_missions.so": "379f6f36d50f6ee04fae47d5d52ba1983b717885f17df36ea8af33c10ddae80a",
+    "build-rc-stream-host/plugins/mavmoos_parameters.so": "657962d81bee95358c6f310ffdb2fc83b67e2dabf5a6c5c391e178185617a2a6",
+    "build-rc-stream-host/plugins/mavmoos_rc_io.so": "ee2bce559e480016d602165b052268076d5394ad62a634a2b51f6624c556e3d6",
+    "build-rc-stream-host/plugins/mavmoos_system_status.so": "40c6cafce86c4432f57a2234b6a48eb5f8381586c1e084cc70169e2cc86a3e6c",
+    "build-rc-stream-host/plugins/mavmoos_telemetry.so": "6fbc77e01087b044ff0c6dab228374a99851d1fcf73c920df8ef5fdc744ac641"
+  },
+  "stock_moos_ref": "023fb54e00692611ecee2cd6f1138d10eec2127e",
+  "stock_moos_status": "",
+  "ardupilot_ref": "04cf6486e8d42ce138de816e8466244346ed77cb",
+  "ardupilot_status": "",
+  "reference_uav_existing_status_preserved": " M missions/UAV_Fly_Refuel/missionConfig.yaml\n?? missions/UAV_Fly_Refuel/.checkvars\n?? missions/m2_berta/.checkvars\n?? missions/s1_alpha/.codex_terminal_launch.sh\n",
+  "portable_check": {
+    "exit": 0,
+    "warnings": 85,
+    "outside_docs": [
+      "warning: missions/copter_sitl/targ_copter.moos contains a fixed MOOS-IvP checkout path; supply MOOS_IVP_ROOT at configuration time or through the caller environment",
+      "warning: tests/rc_io_native/README.md contains a fixed MOOS-IvP checkout path; supply MOOS_IVP_ROOT at configuration time or through the caller environment"
+    ],
+    "classification": "83 archival documentation/provenance files, one generated ignored mission and one test README example; no production source or build recipe fixed-root warning"
+  },
+  "generator": {
+    "path": "/Users/charlesbenjamin/moos-ivp/scripts/GenMOOSApp_AppCasting",
+    "usage_exit": 0,
+    "usage": "GenMOOSApp_AppCasting: usage: /Users/charlesbenjamin/moos-ivp/scripts/GenMOOSApp_AppCasting [app-name] [prefix]\n"
+  },
+  "scope": "Source/dependency/artifact identity, not field or vehicle control qualification"
+}

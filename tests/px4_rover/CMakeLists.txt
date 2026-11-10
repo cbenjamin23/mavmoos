@@ -1,0 +1,14 @@
+add_executable(px4_rover_backend_tests Px4RoverBackendTests.cpp)
+target_link_libraries(px4_rover_backend_tests PRIVATE mavmoos_px4_rover_components)
+add_test(NAME px4_rover_backend COMMAND px4_rover_backend_tests)
+
+add_executable(px4_rover_mission_tests Px4RoverMissionTests.cpp)
+target_link_libraries(px4_rover_mission_tests PRIVATE mavmoos_px4_rover_components)
+add_test(NAME px4_rover_mission COMMAND px4_rover_mission_tests)
+
+add_executable(px4_rover_runtime_tests Px4RoverRuntimeTests.cpp)
+target_link_libraries(px4_rover_runtime_tests PRIVATE mavmoos_runtime)
+add_test(NAME px4_rover_runtime COMMAND px4_rover_runtime_tests
+  $<TARGET_FILE:mavmoos_px4_rover_control> $<TARGET_FILE:mavmoos_missions>)
+
+set_tests_properties(px4_rover_backend px4_rover_mission px4_rover_runtime PROPERTIES TIMEOUT 15)

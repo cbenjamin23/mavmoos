@@ -1,0 +1,29 @@
+ServerHost = 127.0.0.1
+ServerPort = 9100
+Community = mavmoos_kit_receive_only
+MOOSTimeWarp = 1
+
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 100
+  Run = MOOSDB @ NewConsole = false
+  Run = iMAVLink @ NewConsole = false
+}
+
+ProcessConfig = iMAVLink
+{
+  AppTick = 30
+  CommsTick = 30
+  bind_address = 127.0.0.1
+  bind_port = 14600
+  peer_address = 127.0.0.1
+  peer_port = 14601
+  target_system = 1
+  target_component = 1
+  expected_type = 2
+  expected_autopilot = 3
+  simulation_only = false
+  shadow_mode = false
+  plugins = telemetry,odometry
+  plugin_directory = @PLUGIN_DIRECTORY@
+}

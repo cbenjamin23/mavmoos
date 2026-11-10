@@ -1,0 +1,20 @@
+// Optional settings inside an existing ProcessConfig=iMAVLink block.
+// Replace the absolute directory and ports with the owned local setup.
+plugin_directory = /absolute/path/to/build-example-observer/plugins
+plugins = example_heartbeat_observer
+// Checked module-local startup settings; omit both for 2s/0.25s defaults.
+plugin.example_heartbeat_observer.sample_timeout = 0.5
+plugin.example_heartbeat_observer.publish_interval = 0.1
+bind_address = 127.0.0.1
+bind_port = 14600
+peer_address = 127.0.0.1
+peer_port = 14601
+target_system = 1
+target_component = 1
+vehicle_profile = arducopter
+expected_type = 2
+expected_autopilot = 3
+simulation_only = false
+shadow_mode = false
+helm_enabled = false
+firmware_requests = false

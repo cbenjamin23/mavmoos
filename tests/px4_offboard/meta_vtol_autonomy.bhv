@@ -1,0 +1,51 @@
+// Stock VTOL survey. Two hover checkpoints gate the native transition.
+initialize DEPLOY = false
+initialize AIRCRAFT_LEG = hover
+initialize MOOS_MANUAL_OVERRIDE = false
+
+Behavior = BHV_Waypoint
+{
+  name = survey_dogleg
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AIRCRAFT_LEG = hover
+  speed = 2
+  capture_radius = 2
+  slip_radius = 3
+  wpt_index_var = AUTONOMY_INDEX
+  points = 12,0:14,12:45,12
+}
+
+Behavior = BHV_Waypoint
+{
+  name = forward_corridor
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AIRCRAFT_LEG = forward
+  updates = STRESS_ROUTE_UPDATE
+  speed = $(FORWARD_SPEED)
+  capture_radius = 2
+  slip_radius = 4
+  points = 350,0
+}
+
+Behavior = BHV_Waypoint
+{
+  name = approach_gate
+  pwt = 100
+  condition = DEPLOY = true
+  condition = AIRCRAFT_LEG = final
+  speed = 2
+  capture_radius = 2
+  slip_radius = 4
+  points = 200,0
+}
+
+Behavior = BHV_ConstantAltitude
+{
+  name = home_relative_height
+  pwt = 100
+  condition = DEPLOY = true
+  altitude = $(HELM_HEIGHT)
+  duration = -1
+}

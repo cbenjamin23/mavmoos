@@ -1,0 +1,227 @@
+{
+  "schema": 1,
+  "result": "PASS",
+  "source_revision": "d2bde7eb39b9b333245c9c18573a894254f7ee5c",
+  "git_readback": true,
+  "archives": 6,
+  "members": 1705,
+  "source_members": 343,
+  "jobs": [
+    {
+      "id": "normal-software",
+      "qualification": "current",
+      "result": "PASS",
+      "tier": "software",
+      "cases": 87,
+      "app_sha256": "350ef799f5f56e6f5e90d7d465ce87e24df8151ac686d50774405ce3a3792dd2",
+      "additional_protected_working_inputs": [
+        "missions/copter_sitl/targ_copter.bhv",
+        "missions/copter_sitl/targ_copter.moos"
+      ],
+      "native_cases": 0,
+      "cleanup_reports": 0,
+      "semantic_replays": [],
+      "implicit_probe_bindings": []
+    },
+    {
+      "id": "san-software",
+      "qualification": "current",
+      "result": "PASS",
+      "tier": "software",
+      "cases": 85,
+      "app_sha256": "67be7f649766ad31b90a67431c62e3e4fbaf1a08c29153998ce360091d10f8ec",
+      "additional_protected_working_inputs": [
+        "missions/copter_sitl/targ_copter.bhv",
+        "missions/copter_sitl/targ_copter.moos"
+      ],
+      "native_cases": 0,
+      "cleanup_reports": 0,
+      "semantic_replays": [],
+      "implicit_probe_bindings": []
+    },
+    {
+      "id": "linux-g3-full",
+      "qualification": "current",
+      "result": "PASS",
+      "tier": "full",
+      "cases": 115,
+      "app_sha256": "78f36095b49b33fe195ef8c4e020b1f3a1801c36ac0e7b31870ff40be8cbd9b0",
+      "additional_protected_working_inputs": [],
+      "native_cases": 28,
+      "native_profile_id": "arducopter-dev-04cf6486-quad",
+      "native_platform": {
+        "system": "Linux",
+        "machine": "arm64"
+      },
+      "cleanup_reports": 28,
+      "semantic_replays": [
+        {
+          "id": "ctest.concurrent_mission_read",
+          "member": "linux-g3-01/linux/evidence/ci/cases/ctest.concurrent_mission_read/evidence/mission_read/result.json",
+          "proof": {
+            "declared_shape": "bound_home_only",
+            "item_records_exercised": 1
+          }
+        },
+        {
+          "id": "ctest.observation_load_attitude",
+          "member": "linux-g3-01/linux/evidence/ci/cases/ctest.observation_load_attitude/evidence/result.json",
+          "proof": {
+            "declared_shape": "bound_home_only",
+            "profile": "attitude"
+          }
+        },
+        {
+          "id": "ctest.observation_load_status",
+          "member": "linux-g3-01/linux/evidence/ci/cases/ctest.observation_load_status/evidence/result.json",
+          "proof": {
+            "declared_shape": "bound_home_only",
+            "profile": "status"
+          }
+        },
+        {
+          "id": "native.copter.route_hold_return",
+          "member": "linux-g3-01/linux/evidence/ci/cases/native.copter.route_hold_return/evidence/result.json",
+          "proof": {
+            "scenario": "route_hold_return",
+            "cycles": 1,
+            "early_firmware": {
+              "probe_elapsed": 1.1468715840001096,
+              "epoch": 2,
+              "observation_id": 1,
+              "effective_at": 2006.144287828,
+              "read_at": 2006.169058203,
+              "age_s": 0.21981287500011604,
+              "age_basis": "QUEUE_EMPTY_FLOOR"
+            },
+            "causal_hold_boundaries": true,
+            "whole_bin_framing_qualified": false
+          }
+        },
+        {
+          "id": "native.copter.wind_repeated_cycle",
+          "member": "linux-g3-01/linux/evidence/ci/cases/native.copter.wind_repeated_cycle/evidence/result.json",
+          "proof": {
+            "scenario": "wind_repeated_cycle",
+            "cycles": 2,
+            "early_firmware": {
+              "probe_elapsed": 1.1296037509996495,
+              "epoch": 2,
+              "observation_id": 1,
+              "effective_at": 2120.163154213,
+              "read_at": 2120.192037296,
+              "age_s": 0.21238720900009866,
+              "age_basis": "QUEUE_EMPTY_FLOOR"
+            },
+            "causal_hold_boundaries": true,
+            "whole_bin_framing_qualified": false
+          }
+        },
+        {
+          "id": "native.distance_flight",
+          "member": "linux-g3-01/linux/evidence/ci/cases/native.distance_flight/evidence/result.json",
+          "proof": {
+            "physical_range_m": [
+              0.1,
+              30
+            ],
+            "raw_parameters": {
+              "RNGFND1_MIN": 0.1,
+              "RNGFND1_MAX": 30
+            }
+          }
+        },
+        {
+          "id": "native.copter.auto_complete_handback",
+          "member": "linux-g3-01/linux/evidence/ci/cases/native.copter.auto_complete_handback/evidence/result.json",
+          "proof": {
+            "scenario": "auto_complete_handback",
+            "mission_completed": true,
+            "whole_bin_framing_qualified": false,
+            "causal_observation_boundaries": true
+          }
+        },
+        {
+          "id": "native.copter.auto_pause_abort",
+          "member": "linux-g3-01/linux/evidence/ci/cases/native.copter.auto_pause_abort/evidence/result.json",
+          "proof": {
+            "scenario": "auto_pause_abort",
+            "mission_completed": false,
+            "whole_bin_framing_qualified": false,
+            "causal_observation_boundaries": true
+          }
+        },
+        {
+          "id": "native.imu.rx_only",
+          "member": "linux-g3-01/linux/evidence/ci/cases/native.imu.rx_only/evidence/result.json",
+          "proof": {
+            "families": [
+              26,
+              27,
+              116,
+              129
+            ],
+            "physical_sensor_count": "unknown",
+            "primary_wire_egress_capture": false,
+            "raw_bytes_replayed": true,
+            "decoder": {
+              "pymavlink_version": "2.4.49",
+              "dialect_sha256": "e66f7bf0d5c916ea23dca74d00f036ff40e5ec4e2ca408fdc87840829c6e9b06",
+              "interpreter": "/Users/charlesbenjamin/ardupilot/.venv-ardupilot/bin/python",
+              "python_version": "3.14.7 (main, Aug  5 2026, 10:29:49) [Clang 21.0.0 (clang-2100.1.1.101)]"
+            }
+          }
+        }
+      ],
+      "implicit_probe_bindings": [
+        {
+          "id": "ctest.copter_native_operations",
+          "sha256": "4964584581d436e9f10836ed4305d9552f8f93b0b7d44658070ba07ecf68b0ad",
+          "scope": "frozen source default + configured/inventory/launch argv; original null preserved"
+        },
+        {
+          "id": "ctest.mission_native_transfer",
+          "sha256": "02dc4e955854c3676b11fc712bd35bbfa5cf9ec4e48876837c747dfd0b921cdb",
+          "scope": "frozen source default + configured/inventory/launch argv; original null preserved"
+        },
+        {
+          "id": "ctest.native_rover",
+          "sha256": "3e846d7568e8ef368e6a12cb05121ac98d70f4351db31dd284ad18f719f47e4a",
+          "scope": "frozen source default + configured/inventory/launch argv; original null preserved"
+        },
+        {
+          "id": "ctest.parameters_sitl",
+          "sha256": "b181e20ed5d202b915b0cfacf7331757a51ddece25af41e306ca5d6acddd40a4",
+          "scope": "frozen source default + configured/inventory/launch argv; original null preserved"
+        }
+      ],
+      "firmware_version_range_claim": false,
+      "separate_rover": true,
+      "linux_source_build": {
+        "result": "PASS",
+        "source_built": true,
+        "container_removed": true,
+        "source_revision": "d2bde7eb39b9b333245c9c18573a894254f7ee5c",
+        "raw_source_tar_embedded": false,
+        "independent_whole_tar_replay": false,
+        "selected_git_source_map_bound": true,
+        "archived_executable_retention_claim": false,
+        "execution_domain": "linux-container-isolated",
+        "isolation_replayed": true,
+        "domain_lease_released": true
+      }
+    }
+  ],
+  "scope": "offline frozen source/file/executed-case consistency and named pure semantic replay only; exact recorded simulator/platform; no native launch, field or firmware-version-range qualification",
+  "negative_controls": [
+    "moving_source_label",
+    "wrong_archive_sha256",
+    "missing_indexed_member",
+    "wrong_indexed_member",
+    "unsafe_archive_path",
+    "invented_qualification",
+    "wrong_recorded_output_root"
+  ],
+  "matrix_sha256": "4560591bc6e074335fb42d922783d43dfccab208d1fb132bb358b3bed51fcd89",
+  "reviewer_sha256": "78849148b90555d4fd5ae29c539f8c4bbcb3a87fd050cb3b9b43df8ca973fd33"
+}

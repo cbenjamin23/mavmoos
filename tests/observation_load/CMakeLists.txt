@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.24)
+project(MAVMOOSObservationLoadPrivate LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(NOT MOOS_IVP_ROOT)
+  message(FATAL_ERROR "Supply the built stock MOOS_IVP_ROOT")
+endif()
+find_package(MOOS 10.0 REQUIRED CONFIG PATHS
+  "${MOOS_IVP_ROOT}/build/MOOS/MOOSCore" "${MOOS_IVP_ROOT}/build/MOOS" NO_DEFAULT_PATH)
+add_executable(observation_load_probe ObservationLoadProbe.cpp)
+target_link_libraries(observation_load_probe PRIVATE ${MOOS_LIBRARIES})
+target_compile_options(observation_load_probe PRIVATE -Wall -Wextra -Wpedantic)

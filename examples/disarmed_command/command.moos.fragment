@@ -1,0 +1,10 @@
+// Add to the isolated mission's iMAVLink ProcessConfig.
+// Select the vehicle backend and this explicit request owner.
+plugins = arducopter_control,example_disarmed_command
+control_native_actions = false
+control_helm = false
+control_mission_execution = false
+helm_enabled = false
+firmware_requests = false
+plugin.example_disarmed_command.request_source = uPokeDB
+plugin.example_disarmed_command.observation_timeout = 1.5

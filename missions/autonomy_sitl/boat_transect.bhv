@@ -1,0 +1,60 @@
+//-------------------------------------------------
+// FILE: boat_transect.bhv
+// NAME: Charles Benjamin
+//-------------------------------------------------
+initialize DEPLOY = false
+initialize MOOS_MANUAL_OVERRIDE = false
+initialize SITL_ROUTE_FINISHED = false
+initialize CROSSING_ACTIVE = false
+initialize BHV_ERROR_SEEN = false
+
+//----------------------------------------------------
+Behavior = BHV_Waypoint
+{
+  name = transect
+  pwt = 100
+  condition = DEPLOY = true
+  condition = SITL_ROUTE_FINISHED = false
+  points = 0,28:0,36
+  endflag = SITL_ROUTE_FINISHED = true
+  speed = 1.2
+  capture_radius = 1.4
+  slip_radius = 3
+  lead = 4
+  lead_to_start = true
+  repeat = 0
+}
+
+//----------------------------------------------------
+Behavior = BHV_AvoidCollision
+{
+  name = crossing_vessel
+  pwt = 340
+  condition = DEPLOY = true
+  condition = SITL_ROUTE_FINISHED = false
+  contact = crossing
+  on_no_contact_ok = true
+  extrapolate = false
+  decay = 3,6
+  pwt_outer_dist = 23
+  pwt_inner_dist = 11
+  completed_dist = 34
+  min_util_cpa_dist = 4
+  max_util_cpa_dist = 9
+  pwt_grade = linear
+  activeflag = CROSSING_ACTIVE = true
+}
+
+//----------------------------------------------------
+Behavior = BHV_StationKeep
+{
+  name = end_station
+  pwt = 1
+  condition = DEPLOY = true
+  station_pt = 0,36
+  center_activate = false
+  inner_radius = 0.9
+  outer_radius = 2.5
+  outer_speed = 0.8
+  transit_speed = 1
+}
