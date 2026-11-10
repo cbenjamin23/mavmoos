@@ -1,6 +1,6 @@
 # Manual Plane airspeed witness
 
-One disarmed native `plane` boot exercises the actual `iMAVLink` process in RX_ONLY with the sole startup provider `air_data`. Stock MOOSDB and pAntler start the app and the existing observer probe subscribes to `MAVMOOS_AIRSPEED`. The conventional Plane control workflow and the generated `HIGH_LATENCY2` vectors have separate acceptance. [Plane source and build preflight](../../docs/plans/2026-11-06-overnight-plugin-queue/arduplane-source-preflight.md) · [Air-data contract](../../docs/plugins/air_data.md)
+One disarmed native `plane` boot exercises the actual `iMAVLink` process in RX_ONLY with the sole startup provider `air_data`. Stock MOOSDB and pAntler start the app and the existing observer probe subscribes to `MAVMOOS_AIRSPEED`. The conventional Plane control workflow and the generated `HIGH_LATENCY2` vectors have separate acceptance. [Pinned Plane build](../../docs/implementation/2026-11-06-plane-build/README.md) · [Air-data contract](../../docs/plugins/air_data.md)
 
 ## Pinned producer and route
 

@@ -9,7 +9,7 @@ python3 -m http.server 8080 --bind 127.0.0.1 --directory build-site
 
 Open [the local preview](http://127.0.0.1:8080/). You can also open `build-site/index.html` directly. The local server enables command copying in browsers that require a secure context for clipboard access.
 
-The home page renders the plugin list from `scripts/reproduce.py list --json` and the [provider tracker](../docs/plugin-progress.md). Maintenance shows the current release matrix and the latest archived release verdict. The output contains the generated pages, assets and `.nojekyll`.
+The home page renders the plugin list from `scripts/reproduce.py list --json` and the [plugin catalog](../docs/plugin-catalog.md). Maintenance shows the current release matrix and the latest archived release verdict. The output contains the generated pages, assets and `.nojekyll`.
 
 ## GitHub Pages
 

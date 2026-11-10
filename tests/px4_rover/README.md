@@ -2,7 +2,7 @@
 
 ## Direct firmware witness
 
-This witness runs the locally retained PX4 v1.17.0 Linux ARM64 SIH Ackermann simulator in a network-disabled container. It uses stock firmware and the ordinary MAVLink routes. The test drives the autopilot protocol directly. It provides no MAVMOOS app or stock helm qualification. [Interface study](../../docs/research/2026-11-06-px4-rover-interface.md)
+This witness runs the locally retained PX4 v1.17.0 Linux ARM64 SIH Ackermann simulator in a network-disabled container. It uses stock firmware and the ordinary MAVLink routes. The test drives the autopilot protocol directly. It provides no MAVMOOS app or stock helm qualification.
 
 The host needs the retained firmware volume and a local generated MAVLink 2 common dialect from pymavlink. The runner mounts just the dialect module read-only and verifies its digest. This lets the pinned Linux tools image use the module without installing dependencies. It also verifies the exact simulator binary, Ackermann startup files and owned socket, and takes the common Linux native lease.
 

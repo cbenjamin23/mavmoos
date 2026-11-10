@@ -9,13 +9,10 @@ and its [owned Copter bench](../../missions/external_command/README.md). Keep a
 new provider outside `src/plugins` until its feature boundary and tests justify
 adding it to the standard bundle.
 
-The [current provider/reference crosswalk](../design/2026-11-05-provider-reference-crosswalk/README.md)
-shows the original provider boundaries, shared host services and concrete
-MAVROS/pArduBridge references. Current host/modules use development ABI 10;
-dated evidence at earlier ABIs remains historical.
-For new ports, record the upstream commit, relevant paths and local behavior
-differences in the provider guide. The [build queue's porting procedure](../plans/2026-11-05-autonomous-build-queue/README.md#tracking-mavros-ports)
-shows how to review upstream changes against those records.
+The current host and plugins use ABI 10. When adapting an upstream
+interface, record the source revision, relevant paths and differences in
+behavior in the plugin guide. The [MAVROS crosswalk](../mavros-crosswalk.md)
+maps upstream interfaces to MAVMOOS plugins.
 
 ## Define one coherent capability
 
@@ -74,8 +71,7 @@ of effect-service calls. An attempted mutation fails startup even if the
 module ignores the refusal.
 Read-only queries and MOOS diagnostics remain available. A failed startup
 discards the composition and closes the receiver; fix the configuration and
-restart. New checked configuration has no live reconfiguration path. See
-[decision 0024](../decisions/0024-checked-external-plugin-authoring.md).
+restart to apply configuration changes.
 
 ## Build a matching module
 
@@ -107,10 +103,9 @@ Then integrate the selected module with a matching receive-only app in an owned
 local mission and inspect actual MOOS output/catalog/status and zero wire
 effects. An effectful provider needs a separately authorized owned SITL
 scenario, explicit physical behavior/uncertainty and cleanup assertions. Host
-campaigns serialize under the centrally reserved host lock. The
-[expansion plan](../plans/2026-11-04-expansion/README.md#qualified-parallel-execution-domains)
-also permits one separately leased, resource-bounded isolated Linux domain;
-its inner native cases remain serial and its process IDs stay container-local.
+campaigns serialize under the host lock. The [release campaign guide](sitl-release.md)
+describes the isolated Linux environment. It uses a separate lease, runs
+native cases serially and keeps process IDs within the container.
 Software, app/loopback, host-native, Linux-native and physical evidence are
 distinct qualification layers.
 

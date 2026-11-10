@@ -1,6 +1,6 @@
 # ArduCopter vehicle control
 
-November 4, 2026. `arducopter_control` is the startup-loaded provider for the initial ArduCopter control profile. It groups native flight-controller actions and stock-helm guidance. The module ID is `arducopter_control`; its descriptor profile is `arducopter`. The default identity gate binds the ArduPilot quadrotor. Explicit hexa and octa selections bind their own ArduPilot heartbeat identities and expose the dedicated lifecycle and helm configuration. Effectful use is restricted to the owned localhost native simulator. Receive-only and shadow modes send no MAVLink.
+`arducopter_control` is the control plugin for ArduCopter. It groups native flight-controller actions and stock-helm guidance. The module ID is `arducopter_control`; its descriptor profile is `arducopter`. The default identity gate binds the ArduPilot quadrotor. Explicit hexa and octa selections bind their own ArduPilot heartbeat identities and expose the dedicated lifecycle and helm configuration. Effectful use is restricted to the owned localhost native simulator. Receive-only and shadow modes send no MAVLink.
 
 ## Find functionality by operation
 
@@ -111,7 +111,7 @@ flowchart LR
 
 The provider owns its backend, native and helm components, and the operation coordinator. The coordinator delegates native actions to the existing command component and helm guidance to the existing adapter; it does not open another transport or bypass shared permission. The backend supplies mode/identity predicates, acquisition command proposals, input envelopes and target encoding. Its interface has no `Services` or transport access. The host samples time, arbitrates authority, preserves original deadlines and performs the final send. Trusted C++ plugins are not sandboxed; this interface boundary is an engineering contract.
 
-Telemetry and parameters have their own stream requirements and firmware traits, so neither needs to load vehicle control. Mission data transfer is implemented as an independent `missions` provider; optional AUTO execution collaborates with that provider through host-held verified content and uses this sole control owner/shared sender. Fence/rally, payloads, sensing and bulk services retain separate boundaries. The [whole-architecture review](../design/2026-11-04-capability-plugins/README.md) and refactor evidence record the reasoning, tests and remaining limitations.
+Telemetry and parameters have their own stream requirements and firmware traits, so neither needs to load vehicle control. Mission data transfer is implemented as an independent `missions` provider; optional AUTO execution collaborates with that provider through host-held verified content and uses this sole control owner/shared sender. Fence/rally, payloads, sensing and bulk services retain separate boundaries. See the [architecture guide](../architecture.md#plugin-responsibilities) for the shared plugin boundaries.
 
 ## Capability and compatibility evidence
 

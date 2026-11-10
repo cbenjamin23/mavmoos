@@ -1,6 +1,6 @@
 # Shared firmware discovery
 
-The host provides firmware discovery for the bound FC regardless of which providers are selected. Use modules built with the [matching host ABI](../development/external-plugins.md). The [firmware profiles](../../config/firmware/README.md), [decision 0022](../decisions/0022-local-ci-firmware-and-capability-evidence.md) and qualification ledger distinguish source identity, native build identity and demonstrated behavior.
+The host provides firmware discovery for the bound FC regardless of which providers are selected. Use modules built with the [matching host ABI](../development/external-plugins.md). The [firmware profiles](../../config/firmware/README.md) distinguish source identity, native build identity and demonstrated behavior.
 
 Firmware discovery publishes shared host diagnostics. Providers use the selected profile and its evidence for readiness and qualification.
 

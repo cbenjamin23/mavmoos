@@ -13,7 +13,7 @@ from uuid import uuid4
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TRACKER = 'docs/plugin-progress.md'
+TRACKER = 'docs/plugin-catalog.md'
 RELEASE = 'docs/development/sitl-release.md'
 CONTROL = 'docs/development/control-qualification.md'
 SETUP = 'docs/development/from-scratch.md'
@@ -90,7 +90,7 @@ def workflow(identifier, title, kind, scope, expected, result, guide, keys, reci
 
 
 def provider_workflows(tests):
-    """The provider tracker owns the descriptions and required software witnesses."""
+    """The plugin catalog owns the descriptions and required software witnesses."""
     rows = {}
     for line in (ROOT / TRACKER).read_text().splitlines():
         columns = line.split('|')

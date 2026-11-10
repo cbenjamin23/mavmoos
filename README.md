@@ -8,7 +8,7 @@ The current release enables active control only in software-in-the-loop (SITL), 
 
 ## Start here
 
-- **Find your vehicle.** Check the exact firmware, frame and qualified workflows in the [vehicle support matrix](docs/plans/2026-11-06-vehicle-family-coverage/README.md#coverage-and-gaps). The [provider tracker](docs/plugin-progress.md) covers shared telemetry, mission, parameter and other services.
+- **Find your vehicle.** Check the exact firmware, frame and qualified workflows in the [vehicle support matrix](docs/vehicle-support.md). The [plugin catalog](docs/plugin-catalog.md) covers shared telemetry, mission, parameter and other services.
 - **Run your first mission.** The [Copter SITL starter](missions/copter_release/README.md#run-the-demo) lists the pinned simulator and altitude behavior inputs and gives the launch command. Stock helm flies a waypoint route and stationkeeps before the flight controller lands.
 - **Understand the system.** The [architecture diagram](docs/architecture.md#mavmoos-on-the-backseat-computer) shows how stock helm, iMAVLink and the flight controller exchange observations, requests and targets.
 
@@ -33,11 +33,9 @@ ctest --test-dir build -R '^moos_normal$' --output-on-failure
 
 Use the [setup and workflow guide](docs/development/from-scratch.md) for a fresh MOOS-IvP workspace, the Copter simulator starter, or a plugin test recipe.
 
-## Design and references
+## Technical documentation
 
-MAVROS inspired the separation of MAVLink transport, shared vehicle state, and feature plugins. Its community's work on firmware and protocol changes helps guide MAVMOOS maintenance. MAVMOOS exposes MOOS variables and requests, and qualifies behavior with its own MOOS-IvP and SITL tests. [Design references](docs/references.md)
-
-- [External plugin authoring](docs/development/external-plugins.md) covers matching host and module builds, with observer and command examples.
-- [Decision records](docs/decisions/README.md) explain how the design choices evolved.
-- [Release evidence](docs/development/evidence.md) explains how to retrieve the indexed replay archives on demand.
-- [Control qualification](docs/development/control-qualification.md#running-the-gates) covers software and native tests.
+- [Plugin authoring](docs/development/external-plugins.md) covers external observer and command plugins.
+- [Command and transition coverage](docs/development/control-coverage.md) lists the tested actions, handoffs and failure cases.
+- [Release testing and evidence](docs/development/evidence.md) covers the latest results and reproducibility.
+- [Design references](docs/references.md) links to MOOS-IvP, MAVLink, the autopilots and the MAVROS crosswalk.

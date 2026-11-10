@@ -89,9 +89,9 @@ def read_workflows():
 
 
 def provider_index(workflows):
-    # Use the progress tracker to group the runnable provider recipes.
+    # Use the plugin catalog to group the runnable provider recipes.
     groups = {group: [] for group in PROVIDER_GROUPS}
-    path = ROOT / "docs/plugin-progress.md"
+    path = ROOT / "docs/plugin-catalog.md"
     group = None
     for line in path.read_text(encoding="utf-8").splitlines():
         if line.startswith("## "):
@@ -149,7 +149,7 @@ def load_fragments(workflows):
         "setup_guide": source_link("docs/development/from-scratch.md", "See the setup guide"),
         "copter_starter": source_link("docs/development/from-scratch.md#copter-starter", "Copter starter"),
         "external_plugins": source_link("docs/development/external-plugins.md", "Develop an external plugin"),
-        "mavros_crosswalk": source_link("docs/research/2026-11-06-mavros-ros2-provider-crosswalk.md", "MAVROS crosswalk"),
+        "mavros_crosswalk": source_link("docs/mavros-crosswalk.md", "MAVROS crosswalk"),
         "software": str(receipt["software_executed"]),
         "native": str(receipt["native_sitl_scenarios"]),
         "stress": str(stress_cases),

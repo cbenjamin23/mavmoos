@@ -58,7 +58,7 @@ Set `control_helm = true` in the owned configuration above to expose `MAVMOOS_NA
 
 For the same fixed-motor SITL model, set `plugin.arduquadplane_control.hover_adapter = true` alongside `control_helm = true`. The hover fixture installs the [Lua adapter](../../tests/quadplane_native/hover_adapter.lua) on the simulator and sets `Q_GUIDED_MODE=1`, `SCR_ENABLE=1`, `Q_RTL_MODE=3` and the matching watchdog profile. Acquire from armed, airborne QLoiter with current adapter and navigation evidence. The bridge turns ordinary course, speed up to 3 m/s, and height from 25–90 m above HOME into short position steps. The FC owns the inner loops.
 
-Fresh Guided hover and a single-use adapter offer are required before sending each eligible target. The adapter checks its own expiry and updates the FC's target in place. On producer loss, QLoiter holds and new helm output requires explicit reacquisition. Native modes own both transitions and the forward segment in this configuration. The forward-helm configuration above uses `Q_GUIDED_MODE=0`. [Design decision](../decisions/0038-quadplane-hover-and-local-release-matrix.md)
+Fresh Guided hover and a single-use adapter offer are required before sending each eligible target. The adapter checks its own expiry and updates the FC's target in place. On producer loss, QLoiter holds and new helm output requires explicit reacquisition. Native modes own both transitions and the forward segment in this configuration. The forward-helm configuration above uses `Q_GUIDED_MODE=0`.
 
 Run the round-trip hover case from a clean checkout with the [local release inputs](../development/sitl-release.md).
 

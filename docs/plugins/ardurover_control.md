@@ -53,4 +53,4 @@ Guided zero is a velocity request. Native Hold stops drive. In a current, a boat
 
 The host replaces waiting targets, checks authority and original expiry at final send, and can make one bounded zero-velocity attempt on a loss if fresh armed Guided still qualifies. The FC also has its own 3-second Guided velocity timeout. Releasing control never automatically selects Loiter or RTL. Neither endpoint can recall an already transmitted packet.
 
-[Source trace](../research/2026-11-06-ardurover-profile-source.md) · [SITL fixtures](../../missions/rover_expanded/README.md) · Native qualification and archive
+[SITL fixtures](../../missions/rover_expanded/README.md) · [Control coverage](../development/control-coverage.md)

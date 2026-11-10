@@ -36,7 +36,7 @@ python3 -B scripts/reproduce.py show provider.attitude
 python3 -B scripts/reproduce.py run provider.attitude --workspace "$WORKSPACE"
 ```
 
-Each `provider.<name>` recipe selects the required software witnesses from the [provider tracker](../plugin-progress.md). The catalog also gives the named native cases, expected result and log location. Use `run software` with the same workspace for the full local software suite. Use a fresh output directory on a retry and keep the earlier result for diagnosis.
+Each `provider.<name>` recipe selects the required software witnesses from the [plugin catalog](../plugin-catalog.md). The catalog also gives the named native cases, expected result and log location. Use `run software` with the same workspace for the full local software suite. Use a fresh output directory on a retry and keep the earlier result for diagnosis.
 
 ### Exact native qualification inputs
 
