@@ -13,4 +13,6 @@ The home page renders the plugin list from `scripts/reproduce.py list --json` an
 
 ## GitHub Pages
 
-Use the contents of the build directory as the root of a dedicated Pages source branch, or as the artifact for a manually dispatched Pages deployment. The project site uses relative links and works under the repository path. Detailed source guides use GitHub links and follow the source repository’s access settings. See [GitHub’s publishing-source guide](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
+The [Publish documentation workflow](../.github/workflows/pages.yml) builds and deploys the site from `main` when its templates, assets, or data inputs change. It uploads only the generated site and retains the deployment artifact for one day. You can also run the workflow manually from `main`. Update the workflow’s path filters when adding a new build input.
+
+The project site uses relative links and works under the repository path. Linked source guides are served from GitHub and reflect changes on `main` as soon as those changes are pushed.
