@@ -1,7 +1,5 @@
 # MAVMOOS
 
-<!-- Temporary check of the Pages path filter for an unrelated edit. -->
-
 MAVMOOS connects MOOS-IvP to ArduPilot and PX4 over MAVLink. It is designed to run on a vehicle’s companion computer alongside the IvP Helm (`pHelmIvP`). The `iMAVLink` app loads plugins at startup and defaults to receiving telemetry over UDP.
 
 The current release enables active control only in software-in-the-loop (SITL), where autopilot firmware controls a simulated vehicle. Control on physical vehicles still needs field testing.
