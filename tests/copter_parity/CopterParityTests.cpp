@@ -92,7 +92,7 @@ public:
     runtime.message(message,now);
   }
   void mail(const std::string& key, const std::string& text,
-            const std::string& source = "operator", double published = -1)
+            const std::string& source = "operator", double published = -1, double moos_stamp = -1)
   {
     Mail mail;
     mail.key=key;
@@ -100,7 +100,7 @@ public:
     mail.source=source;
     mail.received_at=now;
     mail.published_at=published<0 ? now : published;
-    runtime.mail(mail);
+    runtime.mail(mail,moos_stamp);
   }
   void request(const std::string& text, const std::string& key = "MAVMOOS_COMMAND")
   {
@@ -305,6 +305,38 @@ int main(int argc,char** argv)
       ++count;
       std::cout<<"PASS "<<name<<'\n';
     };
+    test("one MOOS acquire publication cannot restore authority through clock conversion jitter",[&] {
+      Rig rig(module,false,false,true);
+      constexpr double original=1500000000.;
+      rig.advance();
+      const double published=rig.now;
+      rig.mail("MAVMOOS_NAV_CONTROL","acquire","operator",published,original);
+      rig.advance();rig.helmDemand();rig.tick();
+      require(rig.runtime.navigationGranted()&&rig.navigationFrames()==1,"initial acquisition failed");
+      rig.advance();rig.mail("IVPHELM_ALLSTOP","BehaviorError","pHelmIvP");rig.tick();
+      require(!rig.runtime.navigationGranted(),"hard stop did not revoke the grant");
+      rig.advance();rig.helmDemand();
+      rig.mail("MAVMOOS_NAV_CONTROL","acquire","operator",published+.000015,original);
+      rig.advance();rig.helmDemand();rig.tick();
+      require(!rig.runtime.navigationGranted(),"a second clock conversion turned one publication into a new acquire");
+      const double disconnected=rig.now;
+      rig.runtime.disconnect(disconnected,"moos_connection_lost");
+      rig.advance();rig.fresh();rig.helmDemand();
+      rig.mail("MAVMOOS_NAV_CONTROL","acquire","operator",disconnected+.000020,original);
+      rig.advance();rig.helmDemand();rig.tick();
+      require(!rig.runtime.navigationGranted(),"retained publication restored authority after reconnect");
+      // A new database may start with an earlier MOOS clock.
+      const double new_session_stamp=original-100;
+      rig.advance();
+      const double reacquired_at=rig.now;
+      rig.mail("MAVMOOS_NAV_CONTROL","acquire","operator",reacquired_at,new_session_stamp);
+      rig.advance();rig.helmDemand();rig.tick();
+      require(rig.runtime.navigationGranted(),"a new operator publication could not acquire after reconnect");
+      rig.mail("MAVMOOS_NAV_CONTROL","release","operator",reacquired_at+.000010,new_session_stamp-.000001);
+      require(rig.runtime.navigationGranted(),"an out-of-order source stamp released the new grant");
+      rig.advance();rig.mail("MAVMOOS_NAV_CONTROL","release","operator",rig.now,new_session_stamp+.1);
+      require(!rig.runtime.navigationGranted(),"a genuinely newer release failed after a stale one");
+    });
     test("Copter command wrapper uses the host journal across public request interfaces",[&] {
       NativeReplayDirectory journal;
       {

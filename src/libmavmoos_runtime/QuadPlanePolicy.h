@@ -16,6 +16,13 @@ inline constexpr unsigned hover_marker=0x3148514d; // Wire bytes MQH1
 inline constexpr unsigned hover_hold_offer=3,hover_guided_offer=1,hover_target=2;
 inline constexpr unsigned hover_offer_bytes=10,hover_target_bytes=24;
 
+inline bool requestId(const std::string& text)
+{
+  return !text.empty()&&text.size()<=80&&std::all_of(text.begin(),text.end(),[](unsigned char c) {
+    return (c>='a'&&c<='z')||(c>='A'&&c<='Z')||(c>='0'&&c<='9')||c=='-'||c=='_'||c=='.';
+  });
+}
+
 inline bool fresh(double at,double now,double limit)
 { return std::isfinite(at)&&std::isfinite(now)&&at>=0&&now>=at&&now-at<=limit; }
 
@@ -131,5 +138,15 @@ class PhasePolicy {
 public:
   virtual ~PhasePolicy()=default;
   virtual unsigned phase(double now) const=0;
+};
+
+// Private control-provider interface. The host timestamps the request and
+// distinguishes a possible wire abort from a no-wire ground release.
+enum class HandbackResult { Admitted, Denied, Ineligible };
+class HandbackService {
+public:
+  virtual ~HandbackService()=default;
+  virtual HandbackResult beginQuadPlaneHandback(const std::string& request,const std::string& execution,
+                                               double expires,bool ground_release)=0;
 };
 } // namespace mavmoos::runtime::quadplane

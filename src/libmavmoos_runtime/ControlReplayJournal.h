@@ -11,7 +11,7 @@ public:
   ControlReplayJournal(const ControlReplayJournal&)=delete;
   ControlReplayJournal& operator=(const ControlReplayJournal&)=delete;
   bool seen(const std::string& id) const;
-  Result reserve(const std::string& id);
+  Result reserve(const std::string& id,std::size_t leave_free=0);
   std::size_t size() const { return m_records.size(); }
   static constexpr std::size_t capacity=4096;
 private:

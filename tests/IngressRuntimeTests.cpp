@@ -1,5 +1,8 @@
 #include "Runtime.h"
+#include "Telemetry.h"
+#include "Fixtures.h"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <map>
 #include <stdexcept>
@@ -45,10 +48,73 @@ struct Rig {
     mavlink_message_t m{};mavlink_msg_param_value_encode(1,1,&m,&v);runtime.message(m,floor,time);
   }
 };
+
+void positionHeadingBoundaries(const char* telemetry_module,uint8_t autopilot)
+{
+  std::map<std::string,double> publications;
+  Runtime runtime([&](const auto& key,const auto&,double value,bool numeric) {
+    if(numeric) publications[key]=value;
+  },[](const uint8_t*,std::size_t) -> bool { throw std::runtime_error("receive-only runtime transmitted"); },
+    false,false,{},MAV_TYPE_GROUND_ROVER,autopilot);
+  check(runtime.load(telemetry_module),"load telemetry for position headings");
+  mavmoos::RxConfig config;
+  config.target_system=1; config.target_component=1;
+  config.expected_type=MAV_TYPE_GROUND_ROVER; config.expected_autopilot=autopilot;
+  mavmoos::Telemetry rx(config,"position-heading");
+  rx.setTimedMessageHandler([&](const auto& m,double at,double read_at){runtime.message(m,at,read_at);});
+
+  fixture::Encoder fc;
+  uint64_t datagram=0;
+  auto deliver=[&](const fixture::Bytes& bytes) {
+    const double at=100.+(++datagram)*.01;
+    publications.clear();
+    rx.ingest(bytes.data(),bytes.size(),at,datagram);
+    runtime.tick(at);
+  };
+  const bool px4=autopilot==MAV_AUTOPILOT_PX4;
+  mavlink_heartbeat_t heartbeat{};
+  heartbeat.type=MAV_TYPE_GROUND_ROVER; heartbeat.base_mode=MAV_MODE_FLAG_CUSTOM_MODE_ENABLED;
+  heartbeat.system_status=MAV_STATE_ACTIVE;
+  heartbeat.autopilot=px4?MAV_AUTOPILOT_ARDUPILOTMEGA:MAV_AUTOPILOT_PX4;
+  deliver(fc.encode(heartbeat,mavlink_msg_heartbeat_encode_status));
+  deliver(fc.position(0,36000));
+  check(!rx.observation(mavmoos::Family::Position).present && !runtime.vehicle().position_valid &&
+        !publications.count("NAV_HEADING"),"mismatched controller supplied a heading");
+  heartbeat.autopilot=autopilot;
+  deliver(fc.encode(heartbeat,mavlink_msg_heartbeat_encode_status));
+
+  auto sample=[&](uint16_t raw,bool valid_encoding,double expected) {
+    deliver(fc.position(0,raw));
+    const auto& report=rx.observation(mavmoos::Family::Position);
+    fixture::check(report.present && report.encoding_valid==valid_encoding,
+      "GLOBAL_POSITION_INT.hdg="+std::to_string(raw)+" autopilot="+std::to_string(autopilot)+
+      " raw encoding_valid="+std::to_string(report.encoding_valid)+" Runtime heading="+
+      std::to_string(runtime.vehicle().heading)+" NAV_HEADING_VALID="+std::to_string(publications.at("NAV_HEADING_VALID")));
+    const auto raw_heading=fixture::fields(report.fields).at("heading_deg");
+    if(raw==UINT16_MAX) check(raw_heading=="unknown","unknown heading lost its sentinel");
+    else check(std::stod(raw_heading)==(std::isfinite(expected)?expected:raw/100.),"raw position heading changed");
+    check(runtime.vehicle().position_valid && publications.at("NAV_VALID")==1,"heading invalidated location");
+    if(std::isfinite(expected)) {
+      check(runtime.vehicle().heading==expected && publications.at("NAV_HEADING_VALID")==1 &&
+            publications.at("NAV_HEADING")==expected,"usable heading missing from Runtime or telemetry");
+    } else {
+      check(std::isnan(runtime.vehicle().heading) && publications.at("NAV_HEADING_VALID")==0 &&
+            !publications.count("NAV_HEADING"),"unusable heading published as a bearing");
+    }
+  };
+  sample(0,true,0.);
+  sample(35999,true,359.99);
+  sample(36000,px4,px4?0.:NAN);
+  sample(36001,false,NAN);
+  sample(65534,false,NAN);
+  sample(UINT16_MAX,true,NAN);
+}
 }
 int main(int argc,char** argv) {
   try {
-    check(argc==3,"usage: ingress_runtime_tests PARAMETERS_MODULE CONTROL_MODULE");control_module=argv[2];
+    check(argc==4,"usage: ingress_runtime_tests PARAMETERS_MODULE CONTROL_MODULE TELEMETRY_MODULE");control_module=argv[2];
+    positionHeadingBoundaries(argv[3],MAV_AUTOPILOT_PX4);
+    positionHeadingBoundaries(argv[3],MAV_AUTOPILOT_ARDUPILOTMEGA);
     { Rig r;check(r.runtime.acquireNavigation("initial"),"initial NAV acquire");
       check(r.runtime.navigation({90,1,5,101}),"initial target");
       r.time=100.7;r.runtime.checkpoint(r.time);r.fresh(100.65);
@@ -74,7 +140,7 @@ int main(int argc,char** argv) {
       r.time=102.1;r.runtime.checkpoint(r.time);r.fresh(102.05);r.value(102.05);
       check(r.records["MAVMOOS_PARAM_RESULT"].find("status=CANCELLED")!=std::string::npos,"heartbeat session gap revived pending protocol operation");
     }
-    std::cout<<"PASS 5 ingress/runtime groups: observation continuity, conservative floor, protocol receipt and scoped cancellation\n";
+    std::cout<<"PASS 7 ingress/runtime groups: firmware heading boundaries, observation continuity, conservative floor, protocol receipt and scoped cancellation\n";
     return 0;
   } catch(const std::exception& e) {std::cerr<<"FAIL "<<e.what()<<'\n';return 1;}
 }

@@ -1,4 +1,5 @@
 #include "Runtime.h"
+#include "../libmavmoos_rx/GlobalPositionHeading.h"
 #include "PlaneOperationPolicy.h"
 #include "ControlReplayJournal.h"
 #include <algorithm>
@@ -150,6 +151,16 @@ void Runtime::mail(const Mail& mail,double original_publication)
     if(mail.key=="MAVMOOS_AUTO_RECOVERY_REQUEST") { handleAutoRecoveryRequest(mail); return; }
     if(!std::isfinite(mail.published_at) || mail.published_at<=m_auto_recovery->mail_after) return;
   }
+  if(mail.key=="MAVMOOS_NAV_CONTROL" && !mail.numeric && (mail.text=="acquire" || mail.text=="release") &&
+     std::isfinite(original_publication) && original_publication>0) {
+    // A redelivered MOOS publication has the same source stamp even if sampling
+    // the offset between clocks gives it a slightly different monotonic time.
+    if(!std::isfinite(mail.published_at) || mail.published_at<0 || mail.published_at>mail.received_at+.1 ||
+       mail.published_at<=m_nav_control_session_floor || original_publication==m_nav_control_source_stamp ||
+       (!m_first_nav_control_in_session && original_publication<m_nav_control_source_stamp)) return;
+    m_nav_control_source_stamp=original_publication;
+    m_first_nav_control_in_session=false;
+  }
   if(m_control_replay_enabled && (mail.key=="DEAD_MAN_POST_INTERRUPT" || mail.key=="MAVMOOS_SUB_HANDBACK") &&
      std::isfinite(original_publication) && original_publication>0) {
     std::ostringstream event;
@@ -230,7 +241,7 @@ void Runtime::message(const mavlink_message_t& msg,double at,double read_at,cons
     m_vehicle.latitude=p.lat/1e7; m_vehicle.longitude=p.lon/1e7;
     m_vehicle.msl_height=p.alt/1000.; m_vehicle.relative_height=p.relative_alt/1000.;
     m_vehicle.north_velocity=p.vx/100.; m_vehicle.east_velocity=p.vy/100.; m_vehicle.down_velocity=p.vz/100.;
-    m_vehicle.heading=p.hdg>35999?NAN:p.hdg/100.; break;
+    m_vehicle.heading=globalPositionHeadingDegrees(p.hdg,m_vehicle.autopilot).value_or(NAN); break;
   }
   case MAVLINK_MSG_ID_EXTENDED_SYS_STATE: {
     mavlink_extended_sys_state_t p{}; mavlink_msg_extended_sys_state_decode(&msg,&p);
@@ -628,6 +639,12 @@ void Runtime::disconnect(double boundary,const std::string& reason)
   m_mission_receipt.reset();m_mission_receipt_accepted=false;
   if(m_execution) {m_execution->abort_id.clear();m_execution->abort_expires=0;}
   if(std::isfinite(boundary) && boundary>m_now) m_now=boundary;
+  if(reason=="moos_connection_lost") {
+    // A new database session can have a different clock. Require a new
+    // publication after this boundary and keep fencing the last retained one.
+    m_nav_control_session_floor=m_now;
+    m_first_nav_control_in_session=true;
+  }
   revokeNavigation("connection_lost"); m_hold.reset(); m_commands.clear();
   m_command_handoff.reset(); m_mission_handoff.reset();
   m_parameters.clear(); m_missions.clear(); m_mission_operations.clear(); m_mission_mutations.clear();

@@ -230,7 +230,7 @@ struct Operation {
   std::vector<MissionItem> upload,items;
   std::optional<Phase> phase;
   unsigned expected=0,seq=0,retries=0,current_retries=0,phases=0,legacy_requests=0;
-  uint32_t opaque_id=0;
+  uint32_t opaque_id=0,acknowledged_upload_id=0;
   bool mutation_may_have_applied=false,remote_accepted=false,readback_confirmed=false;
 };
 class Missions final:public Plugin {
@@ -457,7 +457,7 @@ public:
     if(message.msgid==MAVLINK_MSG_ID_MISSION_ACK) {
       mavlink_mission_ack_t ack{};mavlink_msg_mission_ack_decode(&message,&ack);
       if(!target(ack.target_system,ack.target_component,ack.mission_type))return;
-      handleAck(ack.type);
+      handleAck(ack);
     }
   }
 private:
@@ -565,13 +565,18 @@ private:
   }
   void handleCount(const mavlink_mission_count_t& count) {
     auto& op=*m_operation;
+    if(op.stage!=Stage::DownloadCount&&op.stage!=Stage::DownloadItem)return;
+    if(op.acknowledged_upload_id&&count.opaque_id&&op.acknowledged_upload_id!=count.opaque_id) {
+      finish("INCOMPLETE","mission_plan_id_changed");
+      return;
+    }
     if(op.stage==Stage::DownloadItem) {
       if(count.count!=op.expected)finish("INCOMPLETE","mission_count_changed");
       else if(op.opaque_id&&count.opaque_id&&count.opaque_id!=op.opaque_id)
         finish("INCOMPLETE","mission_plan_id_changed");
+      else if(count.opaque_id)op.opaque_id=count.opaque_id;
       return;
     }
-    if(op.stage!=Stage::DownloadCount)return;
     if(count.count>max_items){finish("INCOMPLETE","mission_count_exceeds_bound");return;}
     if(op.download==Download::VerifyUpload&&count.count!=op.upload.size()){finish("FAILED","upload_readback_count_mismatch");return;}
     if(op.download==Download::VerifyClear&&count.count!=0){finish("FAILED","clear_readback_not_empty");return;}
@@ -602,8 +607,9 @@ private:
     if(seq==op.seq) {retry("peer_re_requested_item");return;}
     if(seq==op.seq+1&&seq<op.upload.size())advance(Stage::UploadItem,seq);
   }
-  void handleAck(unsigned result) {
+  void handleAck(const mavlink_mission_ack_t& ack) {
     auto& op=*m_operation;
+    const auto result=ack.type;
     if(result!=MAV_MISSION_ACCEPTED) {
       if(op.inspection&&op.stage==Stage::DownloadCount&&result==MAV_MISSION_UNSUPPORTED) {
         finish("UNSUPPORTED","remote_mission_type_unsupported");return;
@@ -614,6 +620,7 @@ private:
       finish("FAILED","remote_mission_error_"+std::to_string(result));return;
     }
     if(op.stage==Stage::UploadItem&&op.seq+1==op.upload.size()) {
+      op.acknowledged_upload_id=ack.opaque_id;
       op.remote_accepted=true;op.download=Download::VerifyUpload;
       report(op,"ACKNOWLEDGED","upload_accepted_readback_required");advance(Stage::DownloadCount);
     } else if(op.stage==Stage::ClearAck) {

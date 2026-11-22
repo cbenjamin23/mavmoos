@@ -142,9 +142,9 @@ public:
   void onMail(const Mail& mail) override
   {
     if(mail.key!="MAVMOOS_CONTROL_REQUEST") {
-      if(mail.key=="MAVMOOS_NAV_CONTROL"&&!mail.numeric&&validMail(mail)&&
+      if(mail.key=="MAVMOOS_NAV_CONTROL"&&!mail.numeric&&validMail(mail)&&mail.published_at>m_helm_request_at&&
          (mail.text=="acquire"||mail.text=="release")) {
-        m_helm_request_at=std::max(m_helm_request_at,mail.published_at);
+        m_helm_request_at=mail.published_at;
         m_helm_speed.reset();m_helm_height.reset();
         if(m_active)finish("CANCELLED","legacy_navigation_request",false);
       }

@@ -119,7 +119,7 @@ bool Runtime::beginMissionExecution(const std::string& id,uint64_t revision,cons
   if(!m_configuration_valid || !m_simulation || m_shadow || !m_backend ||
      m_execution || !m_command_leases.empty() ||
      m_flight_log || !m_mission_mutations.empty() || !identity(id) || !std::isfinite(expires) ||
-     expires<=m_now || expires-m_now>120 || !proof.valid || proof.revision!=revision ||
+     expires<=m_now || expires>m_now+120 || !proof.valid || proof.revision!=revision ||
      proof.content_id!=content || !missionEntryReady(proof.items)) return false;
   if(!armAutoRecoveryMarker(expires)) return false;
   ExecutionLease lease;lease.id=id;lease.content_id=content;lease.proof_revision=revision;
@@ -232,6 +232,8 @@ void Runtime::refreshMissionExecution()
 
 bool Runtime::beginMissionExecutionAbort(const std::string& abort_id,const std::string& target,double expires)
 {
+  if(quadPlaneProfile())
+    return beginQuadPlaneHandback(abort_id,target,expires,false)==quadplane::HandbackResult::Admitted;
   if(configurationEffectAttempt()) return false;
   if(autoRecoveryBlocksEffects() || !m_configuration_valid || !m_simulation || m_shadow || !m_backend || !m_execution ||
      m_execution->id!=target || !identity(abort_id) || !std::isfinite(expires) ||
@@ -242,16 +244,23 @@ bool Runtime::beginMissionExecutionAbort(const std::string& abort_id,const std::
   auto& lease=*m_execution;
   if(lease.abort_ids.count(abort_id) || lease.abort_ids.size()>=64) return false;
   if(!lease.abort_id.empty() && m_now<lease.abort_expires) return false;
+  lease.abort_ids.insert(abort_id);
+  bindMissionHandback(abort_id,expires);
+  return true;
+}
+
+void Runtime::bindMissionHandback(const std::string& abort_id,double expires)
+{
+  auto& lease=*m_execution;
   quarantineMissionExecution("explicit_abort_or_release");cancelExecutionCommands(true);
   lease.abort_id=abort_id;lease.abort_expires=expires;lease.abort_epoch=m_connection_revision;
-  lease.abort_ids.insert(abort_id);
   lease.abort_started=m_now;lease.abort_sent_at=-1;lease.rover_abort_attempted=false;
   lease.quadplane_abort_attempted=false;
-  if(ardurover) {
+  if(arduRoverMissionPolicy()) {
     lease.ardurover_abort_from=m_vehicle.mode;
     lease.ardurover_abort_mode_changed=false;
   }
-  publishMissionExecutionLease();return true;
+  publishMissionExecutionLease();
 }
 
 bool Runtime::finishMissionExecution(const std::string& id,const std::string& disposition)
@@ -265,13 +274,16 @@ bool Runtime::finishMissionExecution(const std::string& id,const std::string& di
   const bool released=disposition=="RELEASED" && !lease.abort_id.empty() &&
     lease.abort_epoch==m_connection_revision && m_now<lease.abort_expires &&
     (px4RoverProfile()?roverHoldStopped(std::max(boundary,lease.abort_started)):
-      quadPlaneProfile()?quadPlaneGroundHandback(std::max(boundary,lease.abort_started)):
+      quadPlaneProfile()?(lease.quadplane_ground_release&&quadPlaneGroundHandback(std::max(boundary,lease.abort_started))):
       arduRoverMissionPolicy()?(lease.abort_sent_at>=lease.abort_started &&
         arduRoverMissionHandback(std::max(boundary,lease.abort_started))):
       m_vehicle.heartbeat_valid && fresh(m_vehicle.heartbeat_at,2) && !observedExecutionMode() &&
       m_vehicle.heartbeat_at>boundary);
   const bool plane_complete=disposition=="COMPLETED"&&planeProfile()&&planeMissionCompleted();
   if(rejected || released || plane_complete) {
+    // A QuadPlane release has no wire phase. Commit its ID immediately before
+    // clearing the marker, after independently observed post-request ground state.
+    if(released&&quadPlaneProfile()&&reserveControlRequestLeaving(lease.abort_id,0)!=ReplayResult::Reserved)return false;
     if(!clearAutoRecoveryMarker()) return false;
     cancelExecutionCommands(true);m_execution.reset();publishMissionExecutionLease();return true;
   }

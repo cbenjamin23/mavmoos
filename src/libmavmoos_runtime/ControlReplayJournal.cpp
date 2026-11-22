@@ -131,13 +131,13 @@ bool ControlReplayJournal::seen(const std::string& id) const
   return m_records.count(recordName(id))!=0;
 }
 
-ControlReplayJournal::Result ControlReplayJournal::reserve(const std::string& id)
+ControlReplayJournal::Result ControlReplayJournal::reserve(const std::string& id,std::size_t leave_free)
 {
   if(id.empty() || id.size()>max_id) return Result::Unavailable;
   if(m_failed || !bound()) {m_failed=true;return Result::Unavailable;}
   const auto name=recordName(id);
   if(m_records.count(name)) return Result::Seen;
-  if(m_records.size()>=capacity) return Result::Full;
+  if(capacity-m_records.size()<=leave_free) return Result::Full;
   const int fd=openat(m_fd,name.c_str(),O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC,0600);
   if(fd<0) {m_failed=true;return Result::Unavailable;}
   const bool file_synced=sync(fd);

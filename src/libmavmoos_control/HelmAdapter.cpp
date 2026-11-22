@@ -85,7 +85,7 @@ public:
     if(mail.key=="IVPHELM_STATE") {
       if(!mail.numeric && validTime(mail,now) && mail.published_at>=m_state_at) {
         m_helm_state=mail.text; m_state_at=mail.published_at;
-        if(m_phase==Phase::Active && mail.text!="DRIVE") latch("helm_not_driving");
+        if((m_phase==Phase::Active || m_phase==Phase::Paused) && mail.text!="DRIVE") latch("helm_not_driving");
       }
       return;
     }
@@ -93,11 +93,13 @@ public:
       // clear is a retained state, not a heartbeat or scalar freshness renewal.
       if(!mail.numeric && validMetadata(mail,now) && mail.published_at>=m_stop_at) {
         m_stop=mail.text; m_stop_at=mail.published_at; m_producer_resync_after_reset=false;
-        if(m_stop!="clear" && m_phase==Phase::Active) {
-          if(m_stop=="NothingToDo" || m_stop=="NoGoalBehavior") {
+        if(m_stop!="clear" && (m_phase==Phase::Active || m_phase==Phase::Paused)) {
+          if(m_stop!="NothingToDo" && m_stop!="NoGoalBehavior") {
+            latch("allstop:"+m_stop);
+          } else if(m_phase==Phase::Active) {
             if(!m_host.suspendNavigation(now+m_window)) { latch("normal_handoff_rejected"); return; }
             m_phase=Phase::Paused; m_paused=now; m_reason="normal_handoff"; clearFields(now);
-          } else latch("allstop:"+m_stop);
+          }
         }
       }
       return;

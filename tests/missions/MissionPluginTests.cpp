@@ -75,18 +75,18 @@ struct Rig {
     else{mavlink_mission_request_int_t data{};data.seq=uint16_t(seq);data.target_system=uint8_t(target_system);data.target_component=191;data.mission_type=uint8_t(type);mavlink_msg_mission_request_int_encode(1,1,&msg,&data);}
     message(msg);
   }
-  void ack(unsigned type=MAV_MISSION_ACCEPTED,unsigned target_system=245,unsigned mission_type=0){
-    mavlink_mission_ack_t data{};data.type=uint8_t(type);data.target_system=uint8_t(target_system);data.target_component=191;data.mission_type=uint8_t(mission_type);mavlink_message_t msg{};mavlink_msg_mission_ack_encode(1,1,&msg,&data);message(msg);
+  void ack(unsigned type=MAV_MISSION_ACCEPTED,unsigned target_system=245,unsigned mission_type=0,uint32_t opaque=0){
+    mavlink_mission_ack_t data{};data.type=uint8_t(type);data.target_system=uint8_t(target_system);data.target_component=191;data.mission_type=uint8_t(mission_type);data.opaque_id=opaque;mavlink_message_t msg{};mavlink_msg_mission_ack_encode(1,1,&msg,&data);message(msg);
   }
-  void download(const std::vector<MissionItem>& items){
-    sent();count(unsigned(items.size()));advance();
+  void download(const std::vector<MissionItem>& items,uint32_t opaque=0){
+    sent();count(unsigned(items.size()),245,191,0,opaque);advance();
     for(const auto& x:items){require(host.requests.back().action==MissionAction::RequestItem&&host.requests.back().seq==x.seq,"wrong indexed request");sent();item(x);advance();}
     require(host.requests.back().action==MissionAction::Ack,"download ACK not queued");
   }
-  void uploadThroughAck(const std::vector<MissionItem>& items,bool legacy=false){
+  void uploadThroughAck(const std::vector<MissionItem>& items,bool legacy=false,uint32_t opaque=0){
     submit("id=upload,action=upload,items="+rows(items));require(host.requests.back().action==MissionAction::Count,"missing upload count");sent();
     for(unsigned seq=0;seq<items.size();++seq){request(seq,legacy);advance();require(host.requests.back().action==MissionAction::Item&&host.requests.back().seq==seq,"wrong upload item");sent();}
-    ack();advance();require(host.requests.back().action==MissionAction::RequestList,"accepted upload did not require download");
+    ack(MAV_MISSION_ACCEPTED,245,0,opaque);advance();require(host.requests.back().action==MissionAction::RequestList,"accepted upload did not require download");
   }
 };
 }
@@ -241,6 +241,29 @@ int main(int argc,char** argv){
       Rig late;late.submit("id=x,action=download,timeout=1");late.sent();late.advance(1.01);late.count(0);require(late.host.has("original_operation_deadline")&&!late.host.has("status=COMPLETED"),"reply renewed original deadline");
       Rig mutation;mutation.submit("id=x,action=clear,timeout=1");mutation.host.clock+=1.01;mutation.sent();require(mutation.host.has("local_send_outside_original_deadline")&&mutation.host.has("mutation_may_have_applied=true"),"late accepted write lost uncertainty");
     });
+    test("upload readback rejects conflicting plan IDs and allows unknown IDs",[]{
+      const std::vector<MissionItem> items{home(),waypoint()};
+      for(bool delayed_count:{false,true}) {
+        Rig r;
+        r.uploadThroughAck(items,false,37);
+        r.sent();
+        if(delayed_count) {r.count(2);r.advance();r.sent();}
+        r.count(2,245,191,0,84);
+        r.item(items[0]);r.advance(); // A late reply cannot revive the transfer.
+        require(r.host.has("status=INCOMPLETE,reason=mission_plan_id_changed")&&
+                r.host.has("remote_accepted=true,readback_confirmed=false")&&
+                r.host.count("MAVMOOS_MISSION_SNAPSHOT")==0&&
+                r.host.finished==std::vector<std::string>{"upload"},
+                "contradictory upload and readback IDs must retire the operation without proof");
+      }
+      for(uint32_t ack_id:{0u,37u})for(uint32_t readback_id:{0u,37u}) {
+        Rig r;
+        r.uploadThroughAck(items,false,ack_id);
+        r.download(items,readback_id);r.sent();
+        require(r.host.has("status=COMPLETED")&&r.host.has("readback_confirmed=true"),
+                "matching or unsupported plan IDs prevented semantic readback");
+      }
+    });
     test("upload accepts legacy peer requests but requires independent readback",[]{
       Rig r;const auto items=std::vector<MissionItem>{home(),waypoint()};r.uploadThroughAck(items,true);
       require(r.host.has("upload_accepted_readback_required")&&!r.host.has("status=COMPLETED"),"ACK completed upload without readback");
@@ -302,7 +325,8 @@ int main(int argc,char** argv){
       require(r.host.count("MAVMOOS_MISSION_PROGRESS")==2,"older progress displaced a newer observation");
     });
     test("mission download rejects a changed known plan ID at the same count",[]{
-      Rig r;r.submit("id=r,action=download");r.sent();r.count(2,245,191,0,7);r.advance();r.sent();
+      Rig r;r.submit("id=r,action=download");r.sent();r.count(2);r.advance();r.sent();
+      r.count(2,245,191,0,7);
       r.count(2,245,191,0,0);
       require(!r.host.has("status=INCOMPLETE"),"unknown plan ID was interpreted as a change");
       r.count(2,245,191,0,8);r.item(home());r.advance();

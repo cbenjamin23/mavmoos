@@ -92,6 +92,26 @@ int main() {
     test("normal handoff requires new fields",[] { Host h;auto p=plugin(h);active(*p,h);text(*p,h,"IVPHELM_ALLSTOP","NothingToDo",20.2);text(*p,h,"IVPHELM_ALLSTOP","clear",20.3);p->iterate();require(h.targets.size()==1&&status(h,"state=PAUSED"),"old tuple resumed"); });
     test("handoff deadline cannot be renewed by repeated messages",[] { Host h;auto p=plugin(h);active(*p,h);text(*p,h,"IVPHELM_ALLSTOP","NothingToDo",20.2);text(*p,h,"IVPHELM_ALLSTOP","NothingToDo",20.6);h.fresh(20.71);p->iterate();require(status(h,"handoff_window_expired"),"window renewed");text(*p,h,"IVPHELM_ALLSTOP","clear",20.8);fields(*p,h,20.81);p->iterate();require(h.targets.size()==1,"expired pause resumed"); });
     test("behavior error latches until explicit acquisition",[] { Host h;auto p=plugin(h);active(*p,h);text(*p,h,"IVPHELM_ALLSTOP","BehaviorError",20.2);text(*p,h,"IVPHELM_ALLSTOP","clear",20.3);fields(*p,h,20.31);p->iterate();require(status(h,"state=LATCHED")&&h.targets.size()==1,"fault auto-resumed"); });
+    test("a hard stop or loss of DRIVE during a normal handoff requires a new acquire",[] {
+      for(const bool leaves_drive:{false,true}) {
+        Host h;auto p=plugin(h);active(*p,h);
+        text(*p,h,"IVPHELM_ALLSTOP","NothingToDo",20.1);
+        p->iterate();
+        require(statusField(h,"state","PAUSED")&&h.resume_until>h.now(),"expected a resumable handoff");
+        if(leaves_drive) text(*p,h,"IVPHELM_STATE","PARK",20.15);
+        else text(*p,h,"IVPHELM_ALLSTOP","BehaviorError",20.15);
+        text(*p,h,"IVPHELM_ALLSTOP","clear",20.2);
+        text(*p,h,"IVPHELM_STATE","DRIVE",20.21);
+        fields(*p,h,20.22);p->iterate();
+        require(statusField(h,"state","LATCHED")&&h.resume_until==0&&!h.granted&&
+                h.acquisitions==1&&h.targets.size()==1,"hard fault left the handoff resumable");
+        text(*p,h,"MAVMOOS_NAV_CONTROL","acquire",20.25,"operator");p->iterate();
+        require(h.targets.size()==1,"reacquisition reused guidance from the faulted handoff");
+        fields(*p,h,20.26);p->iterate();
+        require(statusField(h,"state","ACTIVE")&&h.acquisitions==2&&h.targets.size()==2,
+                "fresh acquire and guidance did not restore control");
+      }
+    });
     test("duplicate acquire cannot reopen faulted permission",[] { Host h;auto p=plugin(h);active(*p,h);text(*p,h,"IVPHELM_ALLSTOP","BehaviorError",20.2);text(*p,h,"IVPHELM_ALLSTOP","clear",20.3);text(*p,h,"MAVMOOS_NAV_CONTROL","acquire",20.31,"operator",20.03);fields(*p,h,20.32);p->iterate();require(status(h,"state=LATCHED")&&h.acquisitions==1,"replayed acquire reopened authority"); });
     test("pilot mode takeover cannot auto-recapture",[] { Host h;auto p=plugin(h);active(*p,h);h.fresh(20.2);h.state.mode=6;p->iterate();require(status(h,"external_mode_change")&&h.acquisitions==1,"pilot takeover recaptured"); });
     test("stale vehicle blocks navigation",[] { Host h;auto p=plugin(h);active(*p,h);h.time=20.6;p->iterate();require(status(h,"vehicle_observation_stale_or_invalid")&&h.targets.size()==1,"old vehicle state used"); });

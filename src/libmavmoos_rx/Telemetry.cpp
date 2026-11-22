@@ -5,6 +5,7 @@
 /*    DATE: October 29, 2026                                */
 /************************************************************/
 #include "Telemetry.h"
+#include "GlobalPositionHeading.h"
 #include <cmath>
 #include <iomanip>
 #include <locale>
@@ -270,8 +271,8 @@ void Telemetry::accept(const mavlink_message_t& msg, double received_at, uint64_
   } else if(family == Family::Position) {
     mavlink_global_position_int_t value{};
     mavlink_msg_global_position_int_decode(&msg, &value);
-    report.encoding_valid = coordinates(value.lat, value.lon) &&
-                           (value.hdg <= 35999 || value.hdg == UINT16_MAX);
+    const auto heading=globalPositionHeadingDegrees(value.hdg,m_config.expected_autopilot);
+    report.encoding_valid = coordinates(value.lat, value.lon) && (heading || value.hdg == UINT16_MAX);
     if(!report.encoding_valid) report.reason = "position_field_out_of_range";
     fields << ",source_time_domain=boot_ms,source_time=" << value.time_boot_ms
            << ",lat_deg=" << value.lat / 1e7 << ",lon_deg=" << value.lon / 1e7
@@ -280,7 +281,7 @@ void Telemetry::accept(const mavlink_message_t& msg, double received_at, uint64_
            << ",vn_mps=" << value.vx / 100.0 << ",ve_mps=" << value.vy / 100.0
            << ",vd_mps=" << value.vz / 100.0 << ",heading_deg=";
     if(value.hdg == UINT16_MAX) fields << "unknown";
-    else fields << value.hdg / 100.0;
+    else fields << heading.value_or(value.hdg / 100.0);
   } else if(family == Family::Landed) {
     mavlink_extended_sys_state_t value{};
     mavlink_msg_extended_sys_state_decode(&msg, &value);

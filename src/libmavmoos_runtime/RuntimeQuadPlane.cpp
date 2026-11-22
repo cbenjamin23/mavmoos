@@ -122,6 +122,31 @@ bool Runtime::quadPlaneGroundHandback(double after) const
     m_vehicle.heartbeat_at>after&&m_vehicle.landed_at>after&&quadplane::stoppedOnGround(m_vehicle,m_now);
 }
 
+quadplane::HandbackResult Runtime::beginQuadPlaneHandback(const std::string& request,const std::string& target,
+                                                        double expires,bool ground_release)
+{
+  using Result=quadplane::HandbackResult;
+  if(configurationEffectAttempt()||!quadPlaneProfile()||!m_configuration_valid||!m_simulation||m_shadow||
+     autoRecoveryBlocksEffects()||!m_execution||m_execution->id!=target||!quadplane::requestId(request)||
+     !std::isfinite(expires)||m_now>=expires||expires>m_now+15||!m_vehicle.heartbeat_valid||
+     !fresh(m_vehicle.heartbeat_at,2)||controlRequestSeen(request))
+    return Result::Denied;
+  auto& lease=*m_execution;
+  if(lease.abort_ids.count(request)||(!lease.abort_id.empty()&&m_now<lease.abort_expires))return Result::Denied;
+  if(ground_release) {
+    if(!quadPlaneGroundHandback(-1))return Result::Ineligible;
+  } else {
+    if(!lease.auto_seen||lease.quadplane_left_auto||lease.session_epoch!=m_connection_revision||
+       m_vehicle.mode!=quadplane::auto_mode||!m_vehicle.armed||!m_vehicle.in_air||!quadplane::observed(m_vehicle,m_now)||
+       quadPlanePhase()==MAV_VTOL_STATE_UNDEFINED||!quadPlaneHomeBound())return Result::Ineligible;
+    if(lease.abort_ids.size()>=64||reserveControlRequestLeaving(request,1)!=ReplayResult::Reserved)return Result::Denied;
+    lease.abort_ids.insert(request);
+  }
+  lease.quadplane_ground_release=ground_release;
+  bindMissionHandback(request,expires);
+  return Result::Admitted;
+}
+
 bool Runtime::quadPlaneHomeBound() const
 {
   const auto& home=m_execution->home;
@@ -149,7 +174,7 @@ bool Runtime::quadPlaneAtLandingPoint() const
 bool Runtime::quadPlaneCommandEligible(const CommandRequest& r) const
 {
   const auto& lease=*m_execution;
-  if(!r.abort_id.empty())return !lease.quadplane_abort_attempted&&!lease.quadplane_left_auto&&
+  if(!r.abort_id.empty())return !lease.quadplane_ground_release&&!lease.quadplane_abort_attempted&&!lease.quadplane_left_auto&&
     lease.session_epoch==m_connection_revision&&lease.auto_seen&&m_vehicle.mode==quadplane::auto_mode&&quadPlaneHomeBound();
   if(r.command==MAV_CMD_DO_SET_MISSION_CURRENT)return !lease.start_handoff&&lease.quadplane_selected_at<0;
   if(r.command==MAV_CMD_MISSION_START)return !lease.quadplane_start_sent&&lease.quadplane_selected_at>=0&&

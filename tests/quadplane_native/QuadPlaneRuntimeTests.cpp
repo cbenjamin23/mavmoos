@@ -1,9 +1,12 @@
 // Loaded provider and mission DSOs through the production final handoff gate.
 #include "../protocol_faults/ProtocolSupport.h"
 #include "QuadPlanePolicy.h"
+#include "ControlReplayJournal.h"
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <fstream>
+#include <iomanip>
 #include <functional>
 #include <iostream>
 #include <unistd.h>
@@ -43,7 +46,7 @@ struct Rig {
   Runtime host;
 
   Rig(const char* control,const char* missions,const Slot& slot,const char* session="owned-one",
-      bool enable_helm=false,bool enable_hover=false)
+      bool enable_helm=false,bool enable_hover=false,bool persistent_replay=false)
     :helm_enabled(enable_helm),hover_enabled(enable_hover),host([this](const auto& key,const auto& value,double,bool numeric) {
        if(!numeric)publications.push_back({key,value,now});
      },[](const uint8_t*,std::size_t) {
@@ -60,6 +63,7 @@ struct Rig {
     else host.configureModules({});
     host.setFirmwareRequestsEnabled(false);
     host.configureAutoRecovery(slot.directory.string(),session);
+    if(persistent_replay)host.configureControlReplay((slot.directory/"replay").string(),"quadplane-capacity");
     host.setBoundedSend([this](const uint8_t* bytes,std::size_t size,double expires,const Runtime::SendEligibility& gate) {
       const auto packet=decode(bytes,size);
       if(before_send)before_send(packet);
@@ -286,8 +290,9 @@ struct Rig {
   {
     tick();
     const auto proof=upload();
+    const auto prior_arms=sent(MAV_CMD_COMPONENT_ARM_DISARM,1);
     act("id=arm,action=arm");
-    require(sent(MAV_CMD_COMPONENT_ARM_DISARM,1)==1&&!seen(result,"arm","COMPLETED"),"arming requires fresh effect");
+    require(sent(MAV_CMD_COMPONENT_ARM_DISARM,1)==prior_arms+1&&!seen(result,"arm","COMPLETED"),"arming requires fresh effect");
     armed=true;tick();
     require(seen(result,"arm","COMPLETED"),"new observed arming not confirmed");
     cursor=1;tick();
@@ -298,9 +303,18 @@ struct Rig {
     act("id=run,action=run"+binding);
     require(sent(MAV_CMD_DO_SET_MISSION_CURRENT,1,1)==1&&slot.marked(),"cursor not selected under durable lease");
   }
-  void launch(const Slot& slot)
+  void launch(const Slot& slot,bool probe_ineligible_aborts=false)
   {
     select(slot);
+    if(probe_ineligible_aborts) {
+      for(unsigned i=0;i<70;++i) {
+        const auto id="before-auto-"+std::to_string(i);
+        post(request,"schema=1,id="+id+",action=abort,target=run");
+        require(seen(result,id,"REJECTED","final_gate_denied")&&!host.controlRequestSeen(id),
+          "ineligible abort spent a slot or cancelled the accepted start");
+        samples();
+      }
+    }
     cursor_system=9;tick();
     require(sent(MAV_CMD_MISSION_START)==0,"foreign cursor confirmed selection");
     cursor_system=1;tick();tick();
@@ -380,6 +394,70 @@ void cancelled_and_restarted(const char* control,const char* missions)
   r.post("MAVMOOS_AUTO_RECOVERY_REQUEST",release);r.tick();
   require(!slot.marked()&&r.seen("MAVMOOS_AUTO_RECOVERY_RESULT","handback","RELEASED"),
     "fresh disarmed ground recovery did not retire marker");
+}
+
+void handback_at_capacity(const char* control,const char* missions)
+{
+  Slot slot;
+  const auto replay=slot.directory/"replay";
+  std::filesystem::create_directory(replay);
+  std::filesystem::permissions(replay,std::filesystem::perms::owner_all);
+  // Seed existing records from earlier processes. The final 66 requests use
+  // the real plugins, journal and wire gate (64 ordinary, one abort, one release).
+  for(std::size_t i=0;i<ControlReplayJournal::capacity-66;++i) {
+    std::ostringstream name;
+    name<<"ff"<<std::setfill('0')<<std::setw(8)<<std::hex<<i;
+    const auto file=replay/name.str();
+    std::ofstream(file).close();
+    std::filesystem::permissions(file,std::filesystem::perms::owner_read|std::filesystem::perms::owner_write);
+  }
+  {
+    Rig r(control,missions,slot,"owned-one",false,false,true);
+    r.tick();
+    for(unsigned i=0;i<62;++i) {
+      const auto id="ground-"+std::to_string(i);
+      r.act("id="+id+",action="+(r.armed?"disarm":"arm"));
+      r.armed=!r.armed;r.tick();
+      require(r.seen(result,id,"COMPLETED"),"preparatory ground action failed");
+    }
+    r.launch(slot,true);
+    r.act("id=stop-at-limit,action=abort,target=run");
+    require(r.sent(MAV_CMD_DO_SET_MODE,1,quadplane::qrtl)==1&&r.host.controlRequestSeen("stop-at-limit"),
+      "admitted mission lost its abort at the history limit");
+    r.mode=quadplane::qrtl;r.tick();
+    r.act("id=stop-at-limit,action=abort,target=run");
+    require(r.sent(MAV_CMD_DO_SET_MODE,1,quadplane::qrtl)==1,"duplicate abort reached the wire");
+    require(r.host.reserveControlRequest("unrelated")==ReplayResult::Full,"unrelated request consumed handback capacity");
+    r.now+=11;r.tick();
+    r.act("id=fresh-stop-in-qrtl,action=abort,target=run");
+    require(!r.host.controlRequestSeen("fresh-stop-in-qrtl"),"ineligible abort spent the last release slot");
+    r.armed=r.airborne=false;r.height=0;r.mode=quadplane::qloiter;r.tick();
+    r.post(request,"schema=1,id=release-without-observation,action=release,target=run");
+    require(r.seen(result,"release-without-observation","QUEUED"),"ground observation wait did not begin");
+    r.host.tick(r.now);
+    r.now+=.01;r.samples(false);r.host.tick(r.now);
+    require(slot.marked()&&!r.host.controlRequestSeen("release-without-observation"),
+      "pre-request ground evidence or a heartbeat alone cleared the execution");
+    for(unsigned i=0;i<201;++i) {r.now+=.05;r.samples(false);r.host.tick(r.now);}
+    require(r.seen(result,"release-without-observation","TIMED_OUT")&&slot.marked(),
+      "unconfirmed release retired the mission");
+    r.tick();r.act("id=release-at-limit,action=release,target=run");
+    require(r.seen(result,"release-at-limit","COMPLETED")&&!slot.marked()&&r.host.controlRequestSeen("release-at-limit"),
+      "confirmed disarmed handback failed at capacity");
+  }
+  Rig r(control,missions,slot,"owned-two",false,false,true);
+  r.tick();
+  for(const auto id:{"run","stop-at-limit","release-at-limit"}) {
+    r.act(std::string("id=")+id+",action=arm");
+    require(r.seen(result,id,"DUPLICATE")&&r.sent(MAV_CMD_COMPONENT_ARM_DISARM,1)==0,
+      "restart forgot a protected request ID");
+  }
+  const auto proof=r.upload();
+  r.armed=true;r.tick();
+  r.act("id=next-run,action=run,verification_id="+proof.verification_id+",revision="+
+    std::to_string(proof.revision)+",content_id="+proof.content_id);
+  require(r.seen(result,"next-run","REJECTED")&&!slot.marked()&&r.sent(MAV_CMD_MISSION_START)==0,
+    "full history admitted a new mission");
 }
 
 void changed_plan_at_handoff(const char* control,const char* missions,uint8_t cursor_state)
@@ -614,6 +692,7 @@ int main(int argc,char** argv)
     require(argc==3,"expected control and mission DSO paths");
     complete(argv[1],argv[2]);
     cancelled_and_restarted(argv[1],argv[2]);
+    handback_at_capacity(argv[1],argv[2]);
     changed_plan_at_handoff(argv[1],argv[2],MISSION_STATE_NOT_STARTED);
     changed_plan_at_handoff(argv[1],argv[2],MISSION_STATE_UNKNOWN);
     forward_helm(argv[1],argv[2]);

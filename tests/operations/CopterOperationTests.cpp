@@ -140,6 +140,24 @@ int main(int argc,char** argv) {
     r.cancel("hold");const auto n=r.host.targets.size();r.host.time=100.5;r.host.fresh();r.step(100.5);
     require(r.host.result("hold","CANCELLED")&&r.host.result("cancel","COMPLETED")&&!r.host.grant&&r.host.targets.size()==n,"cancel semantics");
   });
+  test("an earlier navigation request cannot cancel a newer Guided hold",[&]{
+    for(const auto* action:{"acquire","release"}) {
+      Rig r(path);
+      r.mail(action,100.05,-1,"MAVMOOS_NAV_CONTROL");
+      r.request("schema=1,id=held,action=hold,strategy=guided",100.15);
+      require(r.host.grant&&r.host.targets.size()==1,"Guided hold was not active");
+      const auto revocations=r.host.revocations.size();
+      r.mail(action,100.34,100.05,"MAVMOOS_NAV_CONTROL");
+      r.mail(action,100.35,100.12,"MAVMOOS_NAV_CONTROL"); // Published before the hold, first delivered now.
+      r.host.fresh();r.step(100.36);
+      require(r.host.grant&&r.host.targets.size()==2&&r.host.revocations.size()==revocations&&
+              !r.host.result("held","CANCELLED"),"obsolete navigation request interrupted Guided hold");
+      r.mail("release",100.4,-1,"MAVMOOS_NAV_CONTROL");
+      r.host.fresh();r.step(100.5);
+      require(!r.host.grant&&r.host.targets.size()==2&&r.host.result("held","CANCELLED"),
+              "a genuinely newer operator release did not stop the hold");
+    }
+  });
   test("vertical adjustment captures current XY and height and observes arrival",[&]{
     Rig r(path);
     r.mail("schema=1,id=vertical,action=adjust_altitude,delta=2,timeout=3",100.2,100.1);

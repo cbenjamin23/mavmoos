@@ -21,10 +21,17 @@ bool Runtime::controlRequestSeen(const std::string& id) const
 
 ReplayResult Runtime::reserveControlRequest(const std::string& id)
 {
+  // Keep capacity for a wire abort and the subsequent no-wire ground release.
+  const bool native_quadplane=quadPlaneProfile()&&hasCapability("control.mission.start");
+  return reserveControlRequestLeaving(id,native_quadplane?2:0);
+}
+
+ReplayResult Runtime::reserveControlRequestLeaving(const std::string& id,std::size_t leave_free)
+{
   if(configurationEffectAttempt()) return ReplayResult::Unavailable;
   if(!m_control_replay_enabled) return ReplayResult::Reserved;
   if(!m_control_replay) return ReplayResult::Unavailable;
-  const auto reserved=m_control_replay->reserve(id);
+  const auto reserved=m_control_replay->reserve(id,leave_free);
   ReplayResult result=ReplayResult::Unavailable;
   switch(reserved) {
   case ControlReplayJournal::Result::Reserved: result=ReplayResult::Reserved; break;

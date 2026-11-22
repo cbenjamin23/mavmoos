@@ -6,6 +6,7 @@
 #include "ControlBackend.h"
 #include "Px4Offboard.h"
 #include "Px4RoverPolicy.h"
+#include "QuadPlanePolicy.h"
 #include "ArduRoverMissionPolicy.h"
 #include "ObservationRequests.h"
 #include "FirmwareDiscovery.h"
@@ -21,7 +22,7 @@
 namespace mavmoos::runtime {
 class ControlReplayJournal;
 class Runtime final: public Services, public FileTransferService, public PayloadService, public ExternalNavigationService,
-  public Px4RoverMissionBinding, public ControlReplayService {
+  public Px4RoverMissionBinding, public ControlReplayService, public quadplane::HandbackService {
 public:
   using Publish=std::function<void(const std::string&,const std::string&,double,bool)>;
   using Send=std::function<bool(const uint8_t*,std::size_t)>;
@@ -108,10 +109,13 @@ public:
   bool missionExecutionGranted(const std::string&) const override;
   bool beginMissionExecutionAbort(const std::string&,const std::string&,double) override;
   bool finishMissionExecution(const std::string&,const std::string&) override;
+  quadplane::HandbackResult beginQuadPlaneHandback(const std::string&,const std::string&,double,bool) override;
   bool navigationGranted() const override { return !m_startup_blocked && !m_configuration_callbacks && m_configuration_valid && !autoRecoveryBlocksEffects() && (m_nav_permission || (m_shadow && m_shadow_grant)); }
   bool controlBusy() const override { return autoRecoveryBlocksEffects() || m_execution.has_value() || !m_command_leases.empty(); }
   bool projectGlobal(double,double,double&,double&) const override;
 private:
+  ReplayResult reserveControlRequestLeaving(const std::string&,std::size_t leave_free);
+  void bindMissionHandback(const std::string&,double);
   void invalidateConfiguration();
   bool configurationEffectAttempt();
   bool fresh(double acquired,double limit) const;
@@ -383,6 +387,7 @@ private:
     bool ardurover_abort_mode_changed=false;
     double quadplane_selected_at=-1,quadplane_handback_at=-1;
     bool quadplane_start_sent=false,quadplane_disarm_sent=false,quadplane_abort_attempted=false,quadplane_left_auto=false;
+    bool quadplane_ground_release=false;
     std::set<std::string> command_ids;
     std::set<std::string> abort_ids;
   };
@@ -400,6 +405,8 @@ private:
   std::unique_ptr<AutoRecovery> m_auto_recovery;
   std::unique_ptr<ControlReplayJournal> m_control_replay;
   std::string m_replay_event;
+  double m_nav_control_source_stamp=0,m_nav_control_session_floor=-1;
+  bool m_first_nav_control_in_session=true;
   bool m_control_replay_enabled=false;
   // Mission, parameter, discovery/streams, flight logs, files. Preserve parameter-first startup.
   unsigned m_next_protocol=1;

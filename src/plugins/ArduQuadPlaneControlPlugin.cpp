@@ -17,13 +17,6 @@ namespace mavmoos::runtime {
 namespace {
 constexpr char request_key[]="MAVMOOS_QUADPLANE_REQUEST", result_key[]="MAVMOOS_QUADPLANE_RESULT";
 
-bool token(const std::string& text)
-{
-  return !text.empty()&&text.size()<=80&&std::all_of(text.begin(),text.end(),[](unsigned char c) {
-    return (c>='a'&&c<='z')||(c>='A'&&c<='Z')||(c>='0'&&c<='9')||c=='-'||c=='_'||c=='.';
-  });
-}
-
 std::map<std::string,std::string> fields(const std::string& text)
 {
   if(text.empty()||text.size()>768||text.back()==',')return {};
@@ -214,10 +207,10 @@ public:
     const auto now=m_host.now();
     auto values=fields(mail.text);
     const auto id=values["id"],action=values["action"];
-    if(values["schema"]!="1"||!token(id)||m_seen.count(id)||m_seen.size()>=64||
+    if(values["schema"]!="1"||!quadplane::requestId(id)||m_seen.count(id)||(m_work&&m_work->id==id)||
        !quadplane::fresh(mail.published_at,now,1)||!quadplane::fresh(mail.received_at,now,1)||
        mail.published_at<=m_floor||mail.published_at>mail.received_at+.1) {
-      result(token(id)?id:"invalid","REJECTED","invalid_stale_or_duplicate");return;
+      result(quadplane::requestId(id)?id:"invalid","REJECTED","invalid_stale_or_duplicate");return;
     }
     if(action=="abort"||action=="release") {
       if(values.size()!=4||m_retained.empty()||values["target"]!=m_retained) {
@@ -225,6 +218,9 @@ public:
       }
       handback(id,action,mail.published_at);return;
     }
+    // Once a run is admitted its exit requests are bounded by that retained
+    // lease. The ordinary admission limit must not strand it.
+    if(m_seen.size()>=64) { result(id,"REJECTED","request_history_full");return; }
     if(m_work||!m_retained.empty()) { result(id,"REJECTED","control_busy");return; }
     const auto& v=m_host.vehicle();
     if(action=="arm"||action=="disarm") {
@@ -292,6 +288,7 @@ public:
     const auto& v=m_host.vehicle();
     if(work.step==Step::Release) {
       if(v.heartbeat_at>work.sent&&m_host.finishMissionExecution(m_retained,"RELEASED")) {
+        m_seen.insert(work.id);
         m_retained.clear();end("COMPLETED","observed_disarmed_handback");
       }
       return;
@@ -332,13 +329,15 @@ private:
     if(action=="release"&&(m_work||v.armed||v.mode!=quadplane::qloiter||!quadplane::stoppedOnGround(v,now))) {
       result(id,"REJECTED","fresh_disarmed_qloiter_required");return;
     }
-    const auto replay=reserveControlRequest(m_host,id);
-    if(replay!=ReplayResult::Reserved) {result(id,replayRejection(replay),replayReason(replay));return;}
-    if(!m_host.beginMissionExecutionAbort(id,m_retained,stamp+10)) {
-      result(id,"REJECTED","host_handback_denied");return;
+    if(controlRequestSeen(m_host,id)) {result(id,"DUPLICATE",replayReason(ReplayResult::Seen));return;}
+    auto* service=dynamic_cast<quadplane::HandbackService*>(&m_host);
+    const auto state=service?service->beginQuadPlaneHandback(id,m_retained,stamp+10,action=="release"):
+      quadplane::HandbackResult::Denied;
+    if(state!=quadplane::HandbackResult::Admitted) {
+      result(id,"REJECTED",state==quadplane::HandbackResult::Ineligible?"final_gate_denied":"host_handback_denied");return;
     }
     if(m_work)end("CANCELLED","explicit_stop_superseded_execution");
-    m_seen.insert(id);
+    if(action=="abort")m_seen.insert(id);
     m_work=Work{id,action,{},action=="abort"?Step::Abort:Step::Release,stamp+10};
     m_work->sent=now;result(id,"QUEUED","retained_execution_bound");
   }

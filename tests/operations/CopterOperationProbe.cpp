@@ -53,11 +53,12 @@ int main(int argc,char** argv) {
   client.SetQuiet(true);if(!client.Run("127.0.0.1",port,"mavmoos_copter_operations",40))throw std::runtime_error("MOOS client start failed");
   enum class Phase {Ready,Rejected,Guided,Arm,Takeoff,ResetSpeed,ChangeSpeed,ChangeCourse,AdjustAltitude,VisualizeHome,
                     HelmSeed,HelmAdjustSpeed,HelmAdjustAltitude,Survey,SurveyCancel,HelmReseed,Voronoi,VoronoiCancel,
-                    GuidedGoto,GuidedHold,GuidedHoldCancel,HelmGoto,HelmHold,HelmHoldCancel,HelmReturn,
+                    GuidedGoto,ReleaseBeforeHold,GuidedHold,ReplayDuringHold,GuidedHoldCancel,HelmGoto,HelmHold,HelmHoldCancel,HelmReturn,
                     PrepareHold,NativeHold,NativeHoldStable,PrecisionOn,PrecisionOff,PrecisionRetreat,
                     PrepareDisabledHold,DisabledHold,DisabledDwell,StageRtl,Rtl,Disarm,Final};
   Phase phase=Phase::Ready;double phase_at=started,last_nav=0,home_lat=0,home_lon=0,hold_min=0,hold_max=0;
   double precision_since=-1;
+  double release_stamp=-1,observed_release_at=-1;
   bool registered=false,have_home=false,home_marker=false;std::set<std::string> helm_outputs;
   std::map<std::string,std::string> runtime,last_status,reasons;
   std::map<std::string,std::set<std::string>> statuses;
@@ -116,6 +117,8 @@ int main(int argc,char** argv) {
         if(key=="MAVMOOS_CONTROL_RESULT"||(parity&&key=="MAVMOOS_COMMAND_RESULT")) {const auto f=fields(value);if(f.count("id")&&f.count("status")) {last_status[f.at("id")]=f.at("status");statuses[f.at("id")].insert(f.at("status"));reasons[f.at("id")]=f.count("reason")?f.at("reason"):"unknown";}}
         if(parity&&key=="VIEW_MARKER"&&phase==Phase::VisualizeHome) {const auto f=fields(value);home_marker=f.count("label")&&f.at("label")=="MAVMOOS_HOME";}
         if(parity&&key=="MAVMOOS_HELM_STATUS")helm_state=fields(value)["state"];
+        if(key=="MAVMOOS_HELM_STATUS"&&fields(value)["reason"]=="operator_release")
+          observed_release_at=item.GetTime();
         if(parity&&key=="MAVMOOS_HELM_OPERATION"&&item.GetTime()>=selector_at) {helm_selector=value;selector_at=item.GetTime();}
         if(parity&&key=="MAVMOOS_HELM_SPEED_UPDATE")speed_update={std::stod(fields(value).at("speed")),item.GetTime()};
         if(parity&&key=="MAVMOOS_OPERATION_ALTITUDE_UPDATE")height_update={std::stod(fields(value).at("altitude")),item.GetTime()};
@@ -217,9 +220,35 @@ int main(int argc,char** argv) {
         notify("PARITY_HELM_SEED","false");guidedGoto();
       }
     } else if(phase==Phase::GuidedGoto) {
-      check("ops-guided-goto");if(done("ops-guided-goto")) {operation("ops-guided-hold","action=hold,strategy=guided,facing=heading,heading=90,timeout=15");transition(Phase::GuidedHold,"guided_hold");}
+      check("ops-guided-goto");
+      if(done("ops-guided-goto")) {
+        release_stamp=MOOSTime();
+        client.Notify("MAVMOOS_NAV_CONTROL",std::string("release"),release_stamp);
+        log("request","MAVMOOS_NAV_CONTROL","release",release_stamp);
+        transition(Phase::ReleaseBeforeHold,"release_before_guided_hold");
+      }
+    } else if(phase==Phase::ReleaseBeforeHold) {
+      if(observed_release_at>=release_stamp) {
+        operation("ops-guided-hold","action=hold,strategy=guided,facing=heading,heading=90,timeout=15");
+        transition(Phase::GuidedHold,"guided_hold");
+      }
     } else if(phase==Phase::GuidedHold) {
-      check("ops-guided-hold");if(confirmed("ops-guided-hold")&&now-phase_at>=1.5) {operation("ops-guided-cancel","action=cancel,target=ops-guided-hold");transition(Phase::GuidedHoldCancel,"guided_hold_cancel");}
+      check("ops-guided-hold");
+      if(confirmed("ops-guided-hold")) {
+        if(MOOSTime()-release_stamp>=1.5)throw std::runtime_error("release replay missed the fresh-mail window");
+        client.Notify("MAVMOOS_NAV_CONTROL",std::string("release"),release_stamp);
+        log("request","MAVMOOS_NAV_CONTROL","release",release_stamp);
+        transition(Phase::ReplayDuringHold,"replay_during_guided_hold");
+      }
+    } else if(phase==Phase::ReplayDuringHold) {
+      check("ops-guided-hold");
+      if(now-phase_at>=1.5) {
+        if(!yes(runtime["permission"])||runtime["fc_mode"]!="4")
+          throw std::runtime_error("release replay interrupted Guided hold");
+        log("assertion","guided_hold_survived_release_replay","passed");
+        operation("ops-guided-cancel","action=cancel,target=ops-guided-hold");
+        transition(Phase::GuidedHoldCancel,"guided_hold_cancel");
+      }
     } else if(phase==Phase::GuidedHoldCancel) {
       check("ops-guided-cancel");if(done("ops-guided-cancel")&&statuses["ops-guided-hold"].count("CANCELLED")) {operation("ops-helm-goto","action=goto,strategy=helm"+point(2,5)+",speed=1,timeout=40");transition(Phase::HelmGoto,"helm_goto");}
     } else if(phase==Phase::HelmGoto) {
