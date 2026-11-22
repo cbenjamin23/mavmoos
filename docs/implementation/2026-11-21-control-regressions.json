@@ -1,0 +1,66 @@
+{
+  "date": "2026-11-21",
+  "scope": "Five reviewed changes on the published source tree. Software checks, dedicated simulator runs and recorded packet replays.",
+  "source_revision": "d6667029800263e239375e7728ddaf208f297dfc",
+  "hardware": false,
+  "software": {
+    "passed": 162,
+    "failed": 0,
+    "skipped": 0,
+    "junit_sha256": "15b47954cff26d316bbb0d65d7ccbe5acd4731a2a4ac92f6102b250c11eef61f"
+  },
+  "sitl": [
+    {
+      "case": "ArduCopter mission transfer",
+      "firmware_revision": "92b0cd788ec29406f26c6f9c31d5ceedbd1cc538",
+      "uploaded_waypoint_sequences": [
+        0,
+        1,
+        2
+      ],
+      "final_on_ground": true,
+      "result": "PASS",
+      "receipt_sha256": "879c3a2f91071a1ac8a47f5fadea40a014d90310ca7a22274e89b2661fcbdfc4"
+    },
+    {
+      "case": "ArduCopter quad operations and replayed release",
+      "firmware_revision": "92b0cd788ec29406f26c6f9c31d5ceedbd1cc538",
+      "hold_survived_replayed_release": true,
+      "intentional_cancel": "COMPLETED",
+      "final_disarmed_on_ground": true,
+      "result": "PASS",
+      "receipt_sha256": "02f0212bad264e7a51cabf45340cc1ae957be19a294d7e051f6fead2ad9450fb"
+    },
+    {
+      "case": "QuadPlane AUTO abort and ground handback",
+      "firmware_revision": "3fc7011a7d3dc047cbb17d8bd98ee94577d144c6",
+      "independently_observed_mode": "QRTL",
+      "premature_release": "REJECTED",
+      "disarmed_handback": "COMPLETED",
+      "result": "PASS",
+      "receipt_sha256": "20607c27ee798172f37750e9beb962b477143971d26f6b1506b3a240fdaa7cbd"
+    }
+  ],
+  "recorded_px4_ackermann_north_crossing": {
+    "lower": {
+      "frames": 30,
+      "heading_at_north_deg": 0,
+      "heading_valid": true,
+      "mission_starts": 1,
+      "mission_binding_retained": true
+    },
+    "upper": {
+      "frames": 30,
+      "heading_at_north_deg": 0,
+      "heading_valid": true,
+      "mission_starts": 1,
+      "mission_binding_retained": true
+    }
+  },
+  "copter_reboot_replay": {
+    "previous_boot_packet_temporarily_accepted": true,
+    "next_position_boot_ms": 200,
+    "navigation_valid_at_one_second": true,
+    "frames_sent": 0
+  }
+}

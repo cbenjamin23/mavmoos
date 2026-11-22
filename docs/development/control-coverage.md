@@ -6,6 +6,18 @@ This matrix covers the seven vehicle-control providers and their named simulator
 
 For effectful requests, verify admission, packet handoff, FC response and independently observed vehicle state separately. After a timeout or takeover, inspect packets as well as the terminal result. A late packet already handed to the network can have an effect, and renewed observations alone must not restore a retired grant. [Test selection and reproducibility](control-qualification.md)
 
+## Control, navigation and mission regressions
+
+These checks exercise five changes on the November 21 build. The [test record](../implementation/2026-11-21-control-regressions.json) identifies the exact source, firmware and results.
+
+| Case | Software check | Integration evidence |
+| --- | --- | --- |
+| A hard stop interrupts a normal helm handoff | `helm_plugin` requires a new acquire after a behavior error or after pHelmIvP leaves DRIVE. A normal handoff can still resume. | In the MOOS shadow test, pHelmIvP supplied fresh guidance after manual override. The bridge waited for a new acquire. |
+| QuadPlane abort and release at the request-history limit | `quadplane_runtime` fills the request journal and checks that rejected aborts leave room for a valid abort and ground release. Replayed requests stay consumed after restart. | In SITL, QuadPlane left AUTO for QRTL, landed and accepted an explicit release after disarming. |
+| An old operator request arrives during a new Guided hold | `copter_operations` and `copter_parity` distinguish a replayed MOOS publication from a new acquire or release. | The ArduCopter quad held through the replay, accepted an intentional cancel and completed its flight. |
+| The controller acknowledges one mission ID and returns another on readback | `mission_provider` rejects the mismatched readback and withholds the verified plan. | ArduCopter stored three waypoints in SITL. The test read the plan back and cleared it. The conflicting IDs were injected in software. |
+| PX4 reports north as exactly 360.00° | `ingress_runtime` checks the PX4 exception, ArduPilot, nearby values and the unknown-heading sentinel. | A recorded Ackermann north crossing kept heading valid at 0°, retained the mission and emitted one start command under both tested packet timings. |
+
 ## ArduCopter
 
 Pinned ArduCopter 4.6.3 quad, standard hexa plus and standard octa plus. All three named frames have native takeoff confirmation-loss evidence. The quad has broader native fault evidence for the rest of the control interface. Software checks include `command_plugin`, `copter_operations`, `copter_parity`, `helm_plugin`, `resume_permit_review`, `copter_mission_execution`, `mission_execution_runtime` and `auto_recovery_core`. [Operator interface](../plugins/arducopter_control.md) · Quad operator and fault cases · Hexa and octa parity · Frame restart cases
@@ -92,6 +104,8 @@ PX4 1.17.0 SIH quadrotor, conventional fixed-wing and standard VTOL. An earlier 
 | VTOL hover survey and revised forward leg through phase observation loss | **SITL** Independent hover gates, a native forward transition, and physical travel north and east on the revised stock course. | **SITL** Bridge-only phase observation loss denied acquire. Navigation and prestream counters stayed unchanged until safe handback. | **SITL** Explicit acquire followed restored stable phase and native Hold. Native reverse transition, Return, Land and disarm finished the case. |
 
 ## PX4 Ackermann
+
+An earlier simulator run saw PX4 command movement again in native Hold after helm control had been released. The north-heading replay above verifies the mission across the heading boundary. Physical stopping in this experimental profile remains intermittent.
 
 Experimental opt-in PX4 1.17.0 SIH Ackermann. Arming/disarming are independent simulator actions. Software checks are `px4_rover_backend`, `px4_rover_mission` and `px4_rover_runtime`. [Operator interface](../plugins/px4_rover_control.md) · Native full, restart and abort results · [Runner and replay](../../tests/px4_rover/README.md) · Intermittent Hold stop investigation
 
